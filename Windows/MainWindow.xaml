@@ -1,0 +1,46 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PodcastHelper.Windows" x:Class="PodcastHelper.Windows.MainWindow"
+        mc:Ignorable="d"
+        Title="Podcast Helper"
+	    Height="1080"
+	    Width="1920"
+		MinHeight="480"
+		MinWidth="640">
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="../Resources/Styles.xaml"/>
+				<ResourceDictionary Source="../Resources/Controls.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+	<Grid Background="{StaticResource WindowBackgroundColor}">
+		<!--<DockPanel Height="20" VerticalAlignment="Top">
+			<Menu DockPanel.Dock="Top" Background="{StaticResource WindowBackgroundColor}">
+				<MenuItem Header="_File" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}">
+					<MenuItem Header="_New Map" Click="newMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<Separator Style="{StaticResource topBarSeperatorStyle}"/>
+					<MenuItem Header="_Open Map" Click="openMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<MenuItem Header="_Import Map" Click="importMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<Separator Style="{StaticResource topBarSeperatorStyle}" />
+					<MenuItem Header="_Save Map" Click="saveMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+				</MenuItem>
+				<MenuItem Header="_View" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}">
+					<MenuItem Header="_Terrain" Name="terrainView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}"  />
+					<MenuItem Header="_Ore Count" Name="oreView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<MenuItem Header="_Crystal Count" Name="crystalView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<MenuItem Header="_Special" Name="specialView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<MenuItem Header="_Building" Name="buildingView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+					<MenuItem Header="_Unit" Name="unitView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
+				</MenuItem>
+			</Menu>
+		</DockPanel>-->
+		<Grid>
+			<Frame Name="mainPage" Source="../Pages/MainPage.xaml"></Frame>
+		</Grid>
+	</Grid>
+</Window>

@@ -1,0 +1,158 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PodcastHelper">
+
+	<!-- Template for buttons on the grid. CURRENTLY UNUSED -->
+	<ControlTemplate x:Key = "GridButtonColorTemplate" TargetType = "{x:Type Button}">
+		<Button Background="{Binding Background}" Height="{Binding Height}" Width="{Binding Width}" x:Name="btn_main">
+			<!--<ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Content" />-->
+			<Button.Style>
+				<Style TargetType="{x:Type Button}" x:Name="btn_style">
+					<Setter Property="Height" Value="{Binding Height}"/>
+					<Setter Property="Width" Value="{Binding Width}"/>
+					<Setter Property="Background" Value="{Binding Background}"/>
+					<Setter Property="BorderBrush" Value="#FF050505"/>
+					<Setter Property="BorderThickness" Value="1"/>
+					<Setter Property="Foreground" Value="#00FFFFFF"/>
+					<!--<Setter Property="IsEnabled" Value="False" />-->
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="{x:Type Button}">
+								<Border x:Name="border" SnapsToDevicePixels="true" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+									<ContentPresenter x:Name="contentPresenter" Focusable="False"/>
+								</Border>
+								<ControlTemplate.Triggers>
+									<Trigger Property="IsMouseOver" Value="True">
+										<Setter TargetName="border" Property="BorderBrush" Value="Red"/>
+									</Trigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</Button.Style>
+		</Button>
+	</ControlTemplate>
+
+	<!-- Top Bar Context Menu Top Level Header -->
+	<ControlTemplate x:Key="topBarTopLevelHeader" TargetType="{x:Type MenuItem}">
+		<Border Name="Border" BorderBrush="{StaticResource TextBorderColor}" BorderThickness="0">
+			<Grid>
+				<ContentPresenter x:Name="menuContent" Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+				<Popup Name="Popup" Placement="Bottom" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="None">
+					<Border Name="SubmenuBorder" SnapsToDevicePixels="True" Background="{StaticResource WindowBackgroundColor}" BorderBrush="{StaticResource TextBorderColor}" BorderThickness="1" >
+						<StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+					</Border>
+				</Popup>
+			</Grid>
+		</Border>
+		<ControlTemplate.Triggers>
+			<Trigger Property="IsSuspendingPopupAnimation" Value="true">
+				<Setter TargetName="Popup" Property="PopupAnimation" Value="None"/>
+				<!--<Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0"/>
+				<Setter TargetName="menuContent" Property="Margin" Value="5,2,5,3"/>-->
+			</Trigger>
+			<Trigger Property="IsHighlighted" Value="true">
+				<Setter TargetName="Border" Property="Background" Value="{StaticResource ButtonHighlightColor}"/>
+				<Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource TextBorderColor}"/>
+			</Trigger>
+			<Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="True">
+				<!--<Setter TargetName="SubmenuBorder" Property="CornerRadius" Value="0,0,4,4"/>-->
+				<Setter TargetName="SubmenuBorder" Property="Padding" Value="0,0,0,3"/>
+			</Trigger>
+			<!--<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+			</Trigger>-->
+		</ControlTemplate.Triggers>
+	</ControlTemplate>
+
+	<!-- Top Bar Context Menu Top Level Item -->
+	<ControlTemplate x:Key="topBarTopLevelItem" TargetType="MenuItem">
+		<Border Name="Border" BorderBrush="{StaticResource TextBorderColor}" BorderThickness="0">
+			<Grid>
+				<ContentPresenter  Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+			</Grid>
+		</Border>
+		<ControlTemplate.Triggers>
+			<Trigger Property="IsHighlighted" Value="true">
+				<Setter TargetName="Border" Property="Background" Value="{StaticResource ButtonHighlightColor}"/>
+				<Setter TargetName="Border" Property="BorderBrush" Value="Transparent"/>
+			</Trigger>
+			<!--<Trigger Property="IsEnabled" Value="False">
+				<Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+			</Trigger>-->
+		</ControlTemplate.Triggers>
+	</ControlTemplate>
+
+	<!-- Top Bar Context Menu Sub Header -->
+	<ControlTemplate x:Key="topBarSubLevelHeader" TargetType="MenuItem">
+		<Border Name="Border" >
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" SharedSizeGroup="Icon"/>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut"/>
+					<ColumnDefinition Width="13"/>
+				</Grid.ColumnDefinitions>
+				<ContentPresenter Name="Icon" Margin="6,0,6,0" VerticalAlignment="Center" ContentSource="Icon"/>
+				<ContentPresenter Name="HeaderHost" Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True"/>
+				<TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="5,2,2,2" DockPanel.Dock="Right"/>
+				<Path Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 0 7 L 4 3.5 Z" Fill="{StaticResource GlyphBrush}" />
+				<Popup Name="Popup" Placement="Right" HorizontalOffset="-4" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+					<Border Name="SubmenuBorder" SnapsToDevicePixels="True" Background="{StaticResource BarBackgroundColor}" BorderBrush="{StaticResource TextBorderColor}" BorderThickness="1" >
+						<StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+					</Border>
+				</Popup>
+			</Grid>
+		</Border>
+		<ControlTemplate.Triggers>
+			<Trigger Property="Icon" Value="{x:Null}">
+				<Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/>
+			</Trigger>
+			<Trigger Property="IsHighlighted" Value="true">
+				<Setter TargetName="Border" Property="Background" Value="{StaticResource SubMenuHighlightColor}"/>
+			</Trigger>
+			<Trigger SourceName="Popup" Property="Popup.AllowsTransparency" Value="True">
+				<Setter TargetName="SubmenuBorder" Property="CornerRadius" Value="4"/>
+				<Setter TargetName="SubmenuBorder" Property="Padding" Value="0,3,0,3"/>
+			</Trigger>
+			<!--<Trigger Property="IsEnabled" Value="false">
+				<Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}"/>
+			</Trigger>-->
+		</ControlTemplate.Triggers>
+	</ControlTemplate>
+
+	<!-- Top Bar Context Menu Sub Item -->
+	<ControlTemplate x:Key="topBarSubLevelItem" TargetType="{x:Type MenuItem}">
+		<Border x:Name="templateRoot" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+			<Grid Margin="-1">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition MinWidth="22" SharedSizeGroup="MenuItemIconColumnGroup" Width="Auto"/>
+					<ColumnDefinition Width="13"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="30"/>
+					<ColumnDefinition SharedSizeGroup="MenuItemIGTColumnGroup" Width="Auto"/>
+					<ColumnDefinition Width="20"/>
+				</Grid.ColumnDefinitions>
+				<ContentPresenter x:Name="Icon" Content="{TemplateBinding Icon}" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" VerticalAlignment="Center" Width="16"/>
+				<Border x:Name="GlyphPanel" BorderBrush="{StaticResource TextBorderColor}" BorderThickness="0" Background="{StaticResource BarBackgroundColor}" ClipToBounds="False" HorizontalAlignment="Center" Height="21" Margin="-1,0,0,0" Visibility="Hidden" VerticalAlignment="Center" Width="21">
+					<Path x:Name="Glyph" Data="F1M10,1.2L4.7,9.1 4.5,9.1 0,5.2 1.3,3.5 4.3,6.1 8.3,0 10,1.2z" Fill="#FF212121" FlowDirection="LeftToRight" Height="11" Width="10"/>
+				</Border>
+				<ContentPresenter x:Name="menuHeaderContainer" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Grid.Column="2" ContentStringFormat="{TemplateBinding HeaderStringFormat}" ContentSource="Header" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+				<TextBlock x:Name="menuGestureText" Grid.Column="4" Margin="{TemplateBinding Padding}" Opacity="0.7" Text="{TemplateBinding InputGestureText}" VerticalAlignment="Center"/>
+			</Grid>
+		</Border>
+		<ControlTemplate.Triggers>
+			<Trigger Property="Icon" Value="{x:Null}">
+				<Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+			</Trigger>
+			<Trigger Property="IsChecked" Value="True">
+				<Setter Property="Visibility" TargetName="GlyphPanel" Value="Visible"/>
+				<Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
+			</Trigger>
+			<Trigger Property="IsHighlighted" Value="True">
+				<Setter Property="Background" TargetName="templateRoot" Value="{StaticResource SubMenuHighlightColor}"/>
+			</Trigger>
+		</ControlTemplate.Triggers>
+	</ControlTemplate>
+</ResourceDictionary>
