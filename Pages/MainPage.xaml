@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:PodcastHelper.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="1080" d:DesignWidth="1920"
+      d:DesignHeight="410" d:DesignWidth="1040"
       Title="MainPage" >
 	<Page.Resources>
 		<ResourceDictionary>
@@ -13,7 +13,6 @@
 				<ResourceDictionary Source="../Resources/Styles.xaml"/>
 				<ResourceDictionary Source="../Resources/Controls.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
-			<BooleanToVisibilityConverter x:Key="BoolToVis" />
 		</ResourceDictionary>
 	</Page.Resources>
 
@@ -31,8 +30,16 @@
 								<ColumnDefinition Width="100" />
 							</Grid.ColumnDefinitions>
 							<WrapPanel>
-								<TextBlock Text="{Binding Value.PrimaryName}" />
-								<TextBlock Text="{Binding Value.PrimaryName}" Visibility="{Binding Value.Episodes[Value.LatestEpisode].}"/>
+								<TextBlock Text="{Binding Path=Value.EpisodeNumber}"></TextBlock>
+								<TextBlock>
+									<TextBlock.Text>
+										<MultiBinding StringFormat="{}{0} - Episode:{1}">
+											<Binding Path="Key" />
+											<Binding Path="Value.EpisodeNumber" />
+										</MultiBinding>
+									</TextBlock.Text>
+								</TextBlock>
+								<Button Visibility="{Binding Path=Value.Episodes[Value.LatestEpisode].IsDownloaded, Converter={StaticResource BoolToVis} }">Test</Button>
 							</WrapPanel>
 						</Grid>
 					</DataTemplate>

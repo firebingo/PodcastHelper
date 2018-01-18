@@ -66,51 +66,58 @@ namespace PodcastHelper.Models
 
 		public async Task<int> CheckForNew()
 		{
-			if (string.IsNullOrWhiteSpace(RssPath))
+			try
+			{
+				if (string.IsNullOrWhiteSpace(RssPath))
+					return LatestEpisode;
+
+				var newestEpisode = -1;
+				var highestCurrent = -1;
+
+				var pathToGet = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath);
+				if (!Directory.Exists(pathToGet))
+					Directory.CreateDirectory(pathToGet);
+				var files = GetRootAndOneSubFiles(pathToGet);
+
+				foreach (var f in files)
+				{
+					var num = HelperMethods.ParseEpisodeNumber(Path.GetFileNameWithoutExtension(f));
+					if (num > highestCurrent)
+						highestCurrent = num;
+					//If we have the file here mark it as downloaded since we are looping over the files anyways.
+					if (Episodes.ContainsKey(num))
+						Episodes[num].IsDownloaded = true;
+				}
+
+				await GetFeed();
+
+				foreach (var f in _feedCache.Items)
+				{
+					var num = HelperMethods.ParseEpisodeNumber(f.Title.Text);
+					if (num > newestEpisode && num <= MaxEpisodeCount)
+						newestEpisode = num;
+				}
+
+				if (newestEpisode > highestCurrent)
+				{
+					LatestEpisode = newestEpisode;
+					_hasLatest = false;
+				}
+
+				Config.Instance.SaveConfig();
+
 				return LatestEpisode;
-
-			var newestEpisode = -1;
-			var highestCurrent = -1;
-
-			var pathToGet = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath);
-			if (!Directory.Exists(pathToGet))
-				Directory.CreateDirectory(pathToGet);
-			var files = System.IO.Directory.GetFiles(pathToGet);
-
-			foreach (var f in files)
-			{
-				var num = HelperMethods.ParseEpisodeNumber(Path.GetFileNameWithoutExtension(f));
-				if (num > highestCurrent)
-					highestCurrent = num;
-				//If we have the file here mark it as downloaded since we are looping over the files anyways.
-				if(Episodes.ContainsKey(num))
-					Episodes[num].IsDownloaded = true;
 			}
-
-			await getFeed();
-
-			foreach (var f in _feedCache.Items)
+			catch(Exception ex)
 			{
-				var num = HelperMethods.ParseEpisodeNumber(f.Title.Text);
-				if (num > newestEpisode && num <= MaxEpisodeCount)
-					newestEpisode = num;
+				return -1;
 			}
-
-			if (newestEpisode > highestCurrent)
-			{
-				LatestEpisode = newestEpisode;
-				_hasLatest = false;
-			}
-
-			Config.Instance.SaveConfig();
-
-			return LatestEpisode;
 		}
 
 		public async Task FillNewEpisodes()
 		{
 			if (_feedCache == null)
-				await getFeed();
+				await GetFeed();
 
 			var addedNew = false;
 			foreach (var f in _feedCache.Items)
@@ -125,7 +132,7 @@ namespace PodcastHelper.Models
 				{
 					if (!Episodes.ContainsKey(num))
 					{
-						var episode = new PodcastEpisode() { EpisodeNumber = num };
+						var episode = new PodcastEpisode() { EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
 						if (enclosure != null)
 							episode.FileName = enclosure.Segments.Last();
 						Episodes.Add(num, episode);
@@ -138,7 +145,7 @@ namespace PodcastHelper.Models
 				Config.Instance.SaveConfig();
 		}
 
-		private async Task getFeed()
+		private async Task GetFeed()
 		{
 			XmlReader reader = null;
 			SyndicationFeed feed = null;
@@ -154,6 +161,20 @@ namespace PodcastHelper.Models
 				return;
 			}
 		}
+
+		private string[] GetRootAndOneSubFiles(string path)
+		{
+			var retval = new List<string>();
+
+			var subDirectories = Directory.GetDirectories(path);
+			retval.AddRange(Directory.GetFiles(path));
+			foreach(var d in subDirectories)
+			{
+				retval.AddRange(Directory.GetFiles(d));
+			}
+
+			return retval.ToArray();
+		}
 	}
 
 	public class PodcastEpisode
@@ -162,7 +183,8 @@ namespace PodcastHelper.Models
 		public string FileName;
 		public int WatchCount;
 		public bool IsDownloaded;
-		public EpisodeProgress Progress;	
+		public DateTime PublishDateUtc;
+		public EpisodeProgress Progress;
 
 		public PodcastEpisode()
 		{
@@ -171,6 +193,7 @@ namespace PodcastHelper.Models
 			WatchCount = 0;
 			FileName = "";
 			IsDownloaded = false;
+			PublishDateUtc = DateTime.MinValue;
 		}
 	}
 

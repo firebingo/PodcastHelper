@@ -29,8 +29,7 @@ namespace PodcastHelper.Pages
 			InitializeComponent();
 			config = Config.Instance;
 
-			intilizePodcasts();
-			podcastListItems.ItemsSource = PodcastFunctions.LatestPodcastList;
+			intilizePodcasts().ConfigureAwait(false);
 		}
 
 		public async Task intilizePodcasts()
@@ -39,6 +38,8 @@ namespace PodcastHelper.Pages
 			{
 				await pod.Value.CheckForNew();
 				await pod.Value.FillNewEpisodes();
+				await PodcastFunctions.LoadLatestPodcastList();
+				podcastListItems.ItemsSource = PodcastFunctions.LatestPodcastList;
 			}
 		}
 	}

@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:PodcastHelper">
 
+	<BooleanToVisibilityConverter x:Key="BoolToVis" />
+	
 	<!-- Template for buttons on the grid. CURRENTLY UNUSED -->
 	<ControlTemplate x:Key = "GridButtonColorTemplate" TargetType = "{x:Type Button}">
 		<Button Background="{Binding Background}" Height="{Binding Height}" Width="{Binding Width}" x:Name="btn_main">

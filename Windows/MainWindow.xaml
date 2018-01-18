@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:PodcastHelper.Windows" x:Class="PodcastHelper.Windows.MainWindow"
         mc:Ignorable="d"
         Title="Podcast Helper"
-	    Height="1080"
-	    Width="1920"
-		MinHeight="480"
+	    Height="410"
+	    Width="1040"
+		MinHeight="200"
 		MinWidth="640">
 	<Window.Resources>
 		<ResourceDictionary>
