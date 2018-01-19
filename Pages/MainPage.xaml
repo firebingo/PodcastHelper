@@ -20,26 +20,25 @@
 		<Grid x:Name="errorGrid" Height="40" Width="640" HorizontalAlignment="Center" VerticalAlignment="Top">
 			<Label HorizontalAlignment="Center"  Margin="5" Foreground="Red" Content="{Binding Path=errorMessage}"></Label>
 		</Grid>
-		<Grid x:Name="podcastList" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15" Height="800" Width="800">
-			<ItemsControl Name="podcastListItems">
+		<Grid x:Name="recentPodcastList" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15" Height="800" Width="800">
+			<ItemsControl Name="podcastListItems" ItemsSource="{Binding Path=List}">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Grid Margin="0,0,0,5">
+						<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="*" />
 								<ColumnDefinition Width="100" />
 							</Grid.ColumnDefinitions>
 							<WrapPanel>
-								<TextBlock Text="{Binding Path=Value.EpisodeNumber}"></TextBlock>
 								<TextBlock>
 									<TextBlock.Text>
-										<MultiBinding StringFormat="{}{0} - Episode:{1}">
+										<MultiBinding StringFormat="{}{0} - Episode: {1}">
 											<Binding Path="Key" />
 											<Binding Path="Value.EpisodeNumber" />
 										</MultiBinding>
 									</TextBlock.Text>
 								</TextBlock>
-								<Button Visibility="{Binding Path=Value.Episodes[Value.LatestEpisode].IsDownloaded, Converter={StaticResource BoolToVis} }">Test</Button>
+								<Button Margin="5,0,0,0" Visibility="{Binding Path=Value.NotIsDownloaded, Converter={StaticResource BoolToVis} }">Download</Button>
 							</WrapPanel>
 						</Grid>
 					</DataTemplate>

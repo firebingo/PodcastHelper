@@ -28,14 +28,14 @@ namespace PodcastHelper.Models
 
 	public partial class PodcastDirectory
 	{
-		public string ShortCode;
-		public List<string> Names;
-		public string FolderPath;
-		public string RssPath;
-		public int MinEpisodeCount;
-		public int MaxEpisodeCount;
-		public int LatestEpisode;
-		public Dictionary<int, PodcastEpisode> Episodes;
+		public string ShortCode { get; set; }
+		public List<string> Names { get; set; }
+		public string FolderPath { get; set; }
+		public string RssPath { get; set; }
+		public int MinEpisodeCount { get; set; }
+		public int MaxEpisodeCount { get; set; }
+		public int LatestEpisode { get; set; }
+		public Dictionary<int, PodcastEpisode> Episodes { get; set; }
 		private bool _hasLatest;
 		private SyndicationFeed _feedCache;
 
@@ -179,12 +179,17 @@ namespace PodcastHelper.Models
 
 	public class PodcastEpisode
 	{
-		public int EpisodeNumber;
-		public string FileName;
-		public int WatchCount;
-		public bool IsDownloaded;
-		public DateTime PublishDateUtc;
-		public EpisodeProgress Progress;
+		public int EpisodeNumber { get; set; }
+		public string FileName { get; set; }
+		public int WatchCount { get; set; }
+		public bool IsDownloaded { get; set; }
+		public DateTime PublishDateUtc { get; set; }
+		public EpisodeProgress Progress { get; set; }
+
+		public bool NotIsDownloaded
+		{
+			get { return !IsDownloaded; }
+		}
 
 		public PodcastEpisode()
 		{
@@ -199,9 +204,9 @@ namespace PodcastHelper.Models
 
 	public class EpisodeProgress
 	{
-		public double Progress;
-		public TimeSpan Length;
-		public bool HasStarted;
+		public double Progress { get; set; }
+		public TimeSpan Length { get; set; }
+		public bool HasStarted { get; set; }
 
 		public EpisodeProgress()
 		{

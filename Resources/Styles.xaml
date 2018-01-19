@@ -17,6 +17,9 @@
 				<Setter Property="Background" Value="{StaticResource TextBackgroundColor}" />
 				<Setter Property="BorderBrush" Value="{StaticResource TextBorderColor}" />
 			</Style>
+			<Style TargetType="{x:Type TextBlock}">
+				<Setter Property="Foreground" Value="{StaticResource TextForegroundColor}" />
+			</Style>
 		</Style.Resources>
 	</Style>
 
