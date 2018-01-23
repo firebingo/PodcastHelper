@@ -7,6 +7,8 @@ using System.Xml;
 using System.ServiceModel.Syndication;
 using PodcastHelper.Helpers;
 using System.Linq;
+using System.Net;
+using PodcastHelper.Function;
 
 namespace PodcastHelper.Models
 {
@@ -147,7 +149,7 @@ namespace PodcastHelper.Models
 					{
 						var episode = new PodcastEpisode() { EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
 						if (enclosure != null)
-							episode.FileName = enclosure.Segments.Last();
+							episode.FileUri = enclosure;
 						_episodes.Add(num, episode);
 						addedNew = true;
 					}
@@ -156,6 +158,21 @@ namespace PodcastHelper.Models
 
 			if (addedNew)
 				Config.Instance.SaveConfig();
+		}
+
+		public async Task<bool> DownloadEpisode(int episode)
+		{
+			var info = new FileDownloadInfo();
+			if(_episodes.ContainsKey(episode))
+			{
+				var episodeToUse = _episodes[episode];
+				episodeToUse.IsDownloaded = false;
+				info.FileUri = episodeToUse.FileUri.ToString();
+				info.FilePath = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath, episodeToUse.PublishDateUtc.Year.ToString(), episodeToUse.FileName);
+				FileDownloader.AddFile(info);
+				return true;
+			}
+			return false;
 		}
 
 		private async Task GetFeed()
@@ -204,7 +221,7 @@ namespace PodcastHelper.Models
 	public class PodcastEpisode
 	{
 		public int EpisodeNumber { get; set; }
-		public string FileName { get; set; }
+		public Uri FileUri { get; set; }
 		public int WatchCount { get; set; }
 		public bool IsDownloaded { get; set; }
 		public DateTime PublishDateUtc { get; set; }
@@ -215,12 +232,22 @@ namespace PodcastHelper.Models
 			get { return !IsDownloaded; }
 		}
 
+		public string FileName
+		{
+			get
+			{
+				if (FileUri == null)
+					return string.Empty;
+				return FileUri.Segments.Last();
+			}
+		}
+
 		public PodcastEpisode()
 		{
 			EpisodeNumber = 0;
 			Progress = new EpisodeProgress();
 			WatchCount = 0;
-			FileName = "";
+			FileUri = null;
 			IsDownloaded = false;
 			PublishDateUtc = DateTime.MinValue;
 		}

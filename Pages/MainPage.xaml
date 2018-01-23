@@ -37,7 +37,7 @@
 										</MultiBinding>
 									</TextBlock.Text>
 								</TextBlock>
-								<Button Margin="5,0,0,0" Visibility="{Binding Path=Value.NotIsDownloaded, Converter={StaticResource BoolToVis} }">Download</Button>
+								<Button Margin="5,0,0,0" Visibility="{Binding Path=Value.NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
 							</WrapPanel>
 						</Grid>
 					</DataTemplate>

@@ -46,6 +46,27 @@ namespace PodcastHelper.Pages
 			await PodcastFunctions.LoadLatestPodcastList();
 			recentListData.List = PodcastFunctions.LatestPodcastList;
 		}
+
+		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
+		{
+			var button = sender as Button;
+			if (button?.DataContext is KeyValuePair<string, PodcastEpisode>)
+			{
+				var kvp = ((KeyValuePair<string, PodcastEpisode>)button.DataContext);
+				var podcast = config.ConfigObject.PodcastMap.Podcasts.FirstOrDefault(x => x.Value.PrimaryName == kvp.Key).Value;
+				var ep = kvp.Value.EpisodeNumber;
+				if (podcast == null)
+					return;
+				DownloadEpisode(ep, podcast).ConfigureAwait(false);
+			}
+			else
+				return;
+		}
+
+		private async Task DownloadEpisode(int ep, PodcastDirectory podcast)
+		{
+			await podcast.DownloadEpisode(ep);
+		}
 	}
 
 	public class RecentPodcastListData : INotifyPropertyChanged

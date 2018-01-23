@@ -33,19 +33,26 @@ namespace PodcastHelper.Models
 		{
 			try
 			{
+				var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+				if (File.Exists(EpisodeListPath))
+				{
+					EpisodeList = JsonConvert.DeserializeObject<PodcastEpisodeList>(File.ReadAllText(EpisodeListPath), serializerSettings);
+				}
+				else
+				{
+					EpisodeList = new PodcastEpisodeList();
+				}
 				if (File.Exists(ConfigPath))
 				{
-					var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
-					EpisodeList = JsonConvert.DeserializeObject<PodcastEpisodeList>(File.ReadAllText(EpisodeListPath), serializerSettings);
 					ConfigObject = JsonConvert.DeserializeObject<ConfigModel>(File.ReadAllText(ConfigPath), serializerSettings);
 				}
 				else
 				{
 					ConfigObject = new ConfigModel();
-					EpisodeList = new PodcastEpisodeList();
 					ConfigObject.PodcastMap.CreateEmptyIfNone();
-					SaveConfig();
+					
 				}
+				SaveConfig();
 			}
 			catch (Exception ex)
 			{

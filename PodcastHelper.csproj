@@ -78,6 +78,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Function\FileDownloader.cs" />
     <Compile Include="Function\PodcastFunctions.cs" />
     <Compile Include="Models\Config.cs" />
     <Compile Include="Helpers\Helpers.cs" />
