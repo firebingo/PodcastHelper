@@ -24,8 +24,10 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		public readonly string ConfigPath = @"AppData/Config.json";
+		private readonly string ConfigPath = @"AppData/Config.json";
+		private readonly string EpisodeListPath = @"AppData/Episodes.json";
 		public ConfigModel ConfigObject;
+		public PodcastEpisodeList EpisodeList;
 
 		public void loadConfig()
 		{
@@ -34,11 +36,13 @@ namespace PodcastHelper.Models
 				if (File.Exists(ConfigPath))
 				{
 					var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+					EpisodeList = JsonConvert.DeserializeObject<PodcastEpisodeList>(File.ReadAllText(EpisodeListPath), serializerSettings);
 					ConfigObject = JsonConvert.DeserializeObject<ConfigModel>(File.ReadAllText(ConfigPath), serializerSettings);
 				}
 				else
 				{
 					ConfigObject = new ConfigModel();
+					EpisodeList = new PodcastEpisodeList();
 					ConfigObject.PodcastMap.CreateEmptyIfNone();
 					SaveConfig();
 				}
@@ -61,6 +65,13 @@ namespace PodcastHelper.Models
 					JsonSerializer serializer = new JsonSerializer();
 					serializer.Formatting = Formatting.Indented;
 					serializer.Serialize(writer, ConfigObject);
+				}
+
+				using (StreamWriter writer = new StreamWriter(File.Create(EpisodeListPath)))
+				{
+					JsonSerializer serializer = new JsonSerializer();
+					serializer.Formatting = Formatting.Indented;
+					serializer.Serialize(writer, EpisodeList);
 				}
 			}
 			catch (Exception ex)

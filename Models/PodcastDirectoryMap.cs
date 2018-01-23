@@ -26,7 +26,7 @@ namespace PodcastHelper.Models
 		}
 	}
 
-	public partial class PodcastDirectory
+	public class PodcastDirectory
 	{
 		public string ShortCode { get; set; }
 		public List<string> Names { get; set; }
@@ -35,10 +35,9 @@ namespace PodcastHelper.Models
 		public int MinEpisodeCount { get; set; }
 		public int MaxEpisodeCount { get; set; }
 		public int LatestEpisode { get; set; }
-		public Dictionary<int, PodcastEpisode> Episodes { get; set; }
 		private bool _hasLatest;
 		private SyndicationFeed _feedCache;
-
+		private Dictionary<int, PodcastEpisode> _episodes;
 
 		[JsonIgnore]
 		public string PrimaryName
@@ -60,8 +59,18 @@ namespace PodcastHelper.Models
 			MinEpisodeCount = 0;
 			MaxEpisodeCount = int.MaxValue;
 			LatestEpisode = 0;
-			Episodes = new Dictionary<int, PodcastEpisode>();
 			_hasLatest = false;
+			_episodes = null;
+		}
+
+		public void CheckListLoaded()
+		{
+			if (_episodes == null)
+			{
+				if (!Config.Instance.EpisodeList.Episodes.ContainsKey(ShortCode))
+					Config.Instance.EpisodeList.Episodes.Add(ShortCode, new Dictionary<int, PodcastEpisode>());
+				_episodes = Config.Instance.EpisodeList.Episodes[ShortCode];
+			}
 		}
 
 		public async Task<int> CheckForNew()
@@ -70,6 +79,8 @@ namespace PodcastHelper.Models
 			{
 				if (string.IsNullOrWhiteSpace(RssPath))
 					return LatestEpisode;
+
+				CheckListLoaded();
 
 				var newestEpisode = -1;
 				var highestCurrent = -1;
@@ -85,8 +96,8 @@ namespace PodcastHelper.Models
 					if (num > highestCurrent)
 						highestCurrent = num;
 					//If we have the file here mark it as downloaded since we are looping over the files anyways.
-					if (Episodes.ContainsKey(num))
-						Episodes[num].IsDownloaded = true;
+					if (_episodes.ContainsKey(num))
+						_episodes[num].IsDownloaded = true;
 				}
 
 				await GetFeed();
@@ -108,7 +119,7 @@ namespace PodcastHelper.Models
 
 				return LatestEpisode;
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return -1;
 			}
@@ -118,6 +129,8 @@ namespace PodcastHelper.Models
 		{
 			if (_feedCache == null)
 				await GetFeed();
+
+			CheckListLoaded();
 
 			var addedNew = false;
 			foreach (var f in _feedCache.Items)
@@ -130,18 +143,18 @@ namespace PodcastHelper.Models
 				}
 				if (num != -1 && num >= MinEpisodeCount)
 				{
-					if (!Episodes.ContainsKey(num))
+					if (!_episodes.ContainsKey(num))
 					{
 						var episode = new PodcastEpisode() { EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
 						if (enclosure != null)
 							episode.FileName = enclosure.Segments.Last();
-						Episodes.Add(num, episode);
+						_episodes.Add(num, episode);
 						addedNew = true;
 					}
 				}
 			}
 
-			if(addedNew)
+			if (addedNew)
 				Config.Instance.SaveConfig();
 		}
 
@@ -168,12 +181,23 @@ namespace PodcastHelper.Models
 
 			var subDirectories = Directory.GetDirectories(path);
 			retval.AddRange(Directory.GetFiles(path));
-			foreach(var d in subDirectories)
+			foreach (var d in subDirectories)
 			{
 				retval.AddRange(Directory.GetFiles(d));
 			}
 
 			return retval.ToArray();
+		}
+	}
+
+	public class PodcastEpisodeList
+	{
+		//               short name        ep num  episode info
+		public Dictionary<string, Dictionary<int, PodcastEpisode>> Episodes { get; set; }
+
+		public PodcastEpisodeList()
+		{
+			Episodes = new Dictionary<string, Dictionary<int, PodcastEpisode>>();
 		}
 	}
 

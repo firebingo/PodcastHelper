@@ -42,9 +42,9 @@ namespace PodcastHelper.Pages
 			{
 				await pod.Value.CheckForNew();
 				await pod.Value.FillNewEpisodes();
-				await PodcastFunctions.LoadLatestPodcastList();
-				recentListData.List = PodcastFunctions.LatestPodcastList;
 			}
+			await PodcastFunctions.LoadLatestPodcastList();
+			recentListData.List = PodcastFunctions.LatestPodcastList;
 		}
 	}
 

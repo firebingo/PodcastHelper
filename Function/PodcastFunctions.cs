@@ -27,7 +27,11 @@ namespace PodcastHelper.Function
 			var pMap = Config.Instance.ConfigObject.PodcastMap;
 			foreach (var podcast in pMap.Podcasts)
 			{
-				_latestPodcastCache.Add(podcast.Value.PrimaryName, podcast.Value.Episodes[podcast.Value.LatestEpisode]);
+				try
+				{
+					_latestPodcastCache.Add(podcast.Value.PrimaryName, Config.Instance.EpisodeList.Episodes[podcast.Value.ShortCode][podcast.Value.LatestEpisode]);
+				}
+				catch { }
 			}
 		}
 	}
