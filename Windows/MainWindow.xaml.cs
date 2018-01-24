@@ -1,5 +1,7 @@
-﻿using System;
+﻿using PodcastHelper.Function;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,11 @@ namespace PodcastHelper.Windows
 		public MainWindow()
 		{
 			InitializeComponent();
+		}
+
+		private void WindowClosing(object sender, CancelEventArgs e)
+		{
+			FileDownloader.Kill();
 		}
 	}
 }

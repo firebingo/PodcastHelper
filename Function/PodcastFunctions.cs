@@ -6,7 +6,9 @@ namespace PodcastHelper.Function
 {
 	public static class PodcastFunctions
 	{
-		public static Dictionary<string, PodcastEpisode> _latestPodcastCache;
+		private static Dictionary<string, PodcastEpisode> _latestPodcastCache;
+		public delegate void OnUpdate();
+		public static event OnUpdate UpdateLatestList;
 
 		static PodcastFunctions()
 		{
@@ -33,6 +35,12 @@ namespace PodcastHelper.Function
 				}
 				catch { }
 			}
+		}
+
+		public static async Task UpdateLatestPodcastList()
+		{
+			await LoadLatestPodcastList();
+			UpdateLatestList?.Invoke();
 		}
 	}
 }

@@ -127,6 +127,18 @@ namespace PodcastHelper.Models
 			}
 		}
 
+		public async Task CheckForDownloadedEpisodes()
+		{
+			var files = GetRootAndOneSubFiles(Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath));
+			foreach (var ep in _episodes)
+			{
+				if (files.Any(x => Path.GetFileName(x) == ep.Value.FileName))
+					ep.Value.IsDownloaded = true;
+				else
+					ep.Value.IsDownloaded = false;
+			}
+		}
+
 		public async Task FillNewEpisodes()
 		{
 			if (_feedCache == null)
@@ -169,10 +181,23 @@ namespace PodcastHelper.Models
 				episodeToUse.IsDownloaded = false;
 				info.FileUri = episodeToUse.FileUri.ToString();
 				info.FilePath = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath, episodeToUse.PublishDateUtc.Year.ToString(), episodeToUse.FileName);
+				info.epNumber = episode;
+				info.podcastShortCode = ShortCode;
 				FileDownloader.AddFile(info);
+				FileDownloader.onDownloadFinishedEvent += OnFinishDownloading;
 				return true;
 			}
 			return false;
+		}
+
+		private void OnFinishDownloading(bool res, int ep, string shortCode)
+		{
+			if (ShortCode != shortCode)
+				return;
+			var episodeToUse = _episodes[ep];
+			episodeToUse.IsDownloaded = res;
+			FileDownloader.onDownloadFinishedEvent -= OnFinishDownloading;
+			PodcastFunctions.UpdateLatestPodcastList();
 		}
 
 		private async Task GetFeed()

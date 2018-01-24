@@ -9,7 +9,8 @@
 	    Height="410"
 	    Width="1040"
 		MinHeight="200"
-		MinWidth="640">
+		MinWidth="640"
+		Closing="WindowClosing">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

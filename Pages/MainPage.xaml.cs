@@ -31,6 +31,7 @@ namespace PodcastHelper.Pages
 			InitializeComponent();
 			config = Config.Instance;
 
+			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
 			intilizePodcasts().ConfigureAwait(false);
 		}
 
@@ -42,9 +43,16 @@ namespace PodcastHelper.Pages
 			{
 				await pod.Value.CheckForNew();
 				await pod.Value.FillNewEpisodes();
+				await pod.Value.CheckForDownloadedEpisodes();
 			}
-			await PodcastFunctions.LoadLatestPodcastList();
-			recentListData.List = PodcastFunctions.LatestPodcastList;
+			PodcastFunctions.UpdateLatestPodcastList();
+		}
+
+		private void OnLatestListUpdate()
+		{
+			if (recentListData.RecentList != null)
+				recentListData.RecentList.Clear();
+			recentListData.RecentList = new Dictionary<string, PodcastEpisode>(PodcastFunctions.LatestPodcastList);
 		}
 
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
@@ -72,7 +80,7 @@ namespace PodcastHelper.Pages
 	public class RecentPodcastListData : INotifyPropertyChanged
 	{
 		Dictionary<string, PodcastEpisode> _list = null;
-		public Dictionary<string, PodcastEpisode> List
+		public Dictionary<string, PodcastEpisode> RecentList
 		{
 			get
 			{
@@ -81,7 +89,7 @@ namespace PodcastHelper.Pages
 			set
 			{
 				_list = value;
-				NotifyPropertyChanged("List");
+				NotifyPropertyChanged("RecentList");
 			}
 		}
 

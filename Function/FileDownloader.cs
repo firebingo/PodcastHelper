@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,11 +13,15 @@ namespace PodcastHelper.Function
 		private static FileDownloadInfo _downloadingFile;
 		private static Thread _doThread;
 		private static bool _runThread = true;
+		private static WebClient _webClient;
+		public delegate void onDownloadFinished(bool res, int ep, string shortCode);
+		public static event onDownloadFinished onDownloadFinishedEvent;
 
 		static FileDownloader()
 		{
 			_queue = new Queue<FileDownloadInfo>();
 			_downloadingFile = null;
+			_webClient = new WebClient();
 			_runThread = true;
 			_doThread = new Thread(RunThread);
 			_doThread.Start();
@@ -33,13 +39,28 @@ namespace PodcastHelper.Function
 		{
 			do
 			{
-				Thread.Sleep(5000);
+				Thread.Sleep(2000);
 				if(_queue.Count > 0)
 				{
 					_downloadingFile = _queue.Dequeue();
 					if(_downloadingFile != null)
 					{
+						try
+						{
+							var path = Path.GetDirectoryName(_downloadingFile.FilePath);
+							if(!Directory.Exists(path))
+								Directory.CreateDirectory(path);
 
+							_webClient.DownloadFile(_downloadingFile.FileUri, _downloadingFile.FilePath);
+							if (File.Exists(_downloadingFile.FilePath))
+								onDownloadFinishedEvent?.Invoke(true, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+							else
+								onDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+						}
+						catch (Exception ex)
+						{
+							onDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+						}
 					}
 				}
 			}
@@ -61,7 +82,9 @@ namespace PodcastHelper.Function
 
 	public class FileDownloadInfo
 	{
+		public int epNumber;
 		public string FilePath;
 		public string FileUri;
+		public string podcastShortCode;
 	}
 }
