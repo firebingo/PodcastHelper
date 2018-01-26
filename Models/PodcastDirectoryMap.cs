@@ -123,6 +123,7 @@ namespace PodcastHelper.Models
 			}
 			catch (Exception ex)
 			{
+				ErrorTracker.CurrentError = ex.Message;
 				return -1;
 			}
 		}
@@ -159,7 +160,7 @@ namespace PodcastHelper.Models
 				{
 					if (!_episodes.ContainsKey(num))
 					{
-						var episode = new PodcastEpisode() { EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
+						var episode = new PodcastEpisode() { PodcastShortCode = ShortCode, EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
 						if (enclosure != null)
 							episode.FileUri = enclosure;
 						_episodes.Add(num, episode);
@@ -245,17 +246,14 @@ namespace PodcastHelper.Models
 
 	public class PodcastEpisode
 	{
+		public string PodcastShortCode { get; set; }
 		public int EpisodeNumber { get; set; }
+		public string Title { get; set; }
 		public Uri FileUri { get; set; }
 		public int WatchCount { get; set; }
 		public bool IsDownloaded { get; set; }
 		public DateTime PublishDateUtc { get; set; }
 		public EpisodeProgress Progress { get; set; }
-
-		public bool NotIsDownloaded
-		{
-			get { return !IsDownloaded; }
-		}
 
 		public string FileName
 		{
@@ -269,6 +267,8 @@ namespace PodcastHelper.Models
 
 		public PodcastEpisode()
 		{
+			PodcastShortCode = string.Empty;
+			Title = string.Empty;
 			EpisodeNumber = 0;
 			Progress = new EpisodeProgress();
 			WatchCount = 0;

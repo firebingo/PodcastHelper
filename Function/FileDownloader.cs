@@ -60,6 +60,7 @@ namespace PodcastHelper.Function
 						catch (Exception ex)
 						{
 							onDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+							ErrorTracker.CurrentError = ex.Message;
 						}
 					}
 				}

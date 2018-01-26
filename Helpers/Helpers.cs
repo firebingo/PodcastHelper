@@ -35,4 +35,12 @@ namespace PodcastHelper.Helpers
 			return ret;
 		}
 	}
+
+	public static class String_ExtensionMethods
+	{
+		public static bool ContainsInvariant(this string str, string innerText)
+		{
+			return str.IndexOf(innerText, StringComparison.InvariantCultureIgnoreCase) != -1;
+		}
+	}
 }

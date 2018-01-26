@@ -79,11 +79,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Function\Config.cs" />
+    <Compile Include="Function\ErrorTracker.cs" />
     <Compile Include="Function\FileDownloader.cs" />
     <Compile Include="Function\PodcastFunctions.cs" />
     <Compile Include="Models\Config.cs" />
     <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Models\PodcastDirectoryMap.cs" />
+    <Compile Include="Models\ViewModels.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

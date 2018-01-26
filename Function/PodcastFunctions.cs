@@ -1,5 +1,8 @@
-﻿using PodcastHelper.Models;
+﻿using PodcastHelper.Helpers;
+using PodcastHelper.Models;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace PodcastHelper.Function
@@ -41,6 +44,26 @@ namespace PodcastHelper.Function
 		{
 			await LoadLatestPodcastList();
 			UpdateLatestList?.Invoke();
+		}
+
+		public static ObservableCollection<PodcastEpisodeView> SearchPodcasts(string searchString)
+		{
+			var result = new ObservableCollection<PodcastEpisodeView>();
+			var config = Config.Instance;
+
+			foreach(var podcast in config.EpisodeList.Episodes)
+			{
+				foreach(var episode in podcast.Value)
+				{
+					if(episode.Value.FileName.ContainsInvariant(searchString) || episode.Value.EpisodeNumber.ToString().ContainsInvariant(searchString) || episode.Value.Title.ContainsInvariant(searchString))
+					{
+						if(config.ConfigObject.PodcastMap.Podcasts.ContainsKey(episode.Value.PodcastShortCode))
+							result.Add(new PodcastEpisodeView(config.ConfigObject.PodcastMap.Podcasts[episode.Value.PodcastShortCode].PrimaryName, episode.Value));
+					}
+				}
+			}
+
+			return result;
 		}
 	}
 }

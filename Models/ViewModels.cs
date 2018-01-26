@@ -1,0 +1,171 @@
+﻿using PodcastHelper.Function;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace PodcastHelper.Models
+{
+	public class ErrorData : INotifyPropertyChanged
+	{
+		private string _error;
+		public string Error
+		{
+			get
+			{
+				return _error;
+			}
+			set
+			{
+				_error = value;
+				NotifyPropertyChanged("Error");
+			}
+		}
+
+		public ErrorData()
+		{
+			ErrorTracker.UpdateError += OnUpdateError;
+		}
+
+		private void OnUpdateError(string error)
+		{
+			Error = error;
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+
+	public class RecentPodcastListData : INotifyPropertyChanged
+	{
+		ObservableCollection<PodcastEpisodeView> _list = null;
+		public ObservableCollection<PodcastEpisodeView> RecentList
+		{
+			get
+			{
+				return _list;
+			}
+			set
+			{
+				_list = value;
+				NotifyPropertyChanged("RecentList");
+			}
+		}
+
+		public RecentPodcastListData()
+		{
+			_list = new ObservableCollection<PodcastEpisodeView>();
+		}
+
+		public void UpdateRecentList(Dictionary<string, PodcastEpisode> list)
+		{
+			try
+			{
+				_list.Clear();
+				foreach (var item in list)
+				{
+					_list.Add(new PodcastEpisodeView(item));
+				}
+				NotifyPropertyChanged("RecentList");
+			}
+			catch(Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+
+	public class PodcastEpisodeView
+	{
+		public string PrimaryName { get; set; }
+		public bool NotIsDownloaded
+		{
+			get
+			{
+				return !Episode.IsDownloaded;
+			}
+		}
+		public PodcastEpisode Episode { get; set; }
+
+		public PodcastEpisodeView(KeyValuePair<string, PodcastEpisode> key)
+		{
+			PrimaryName = key.Key;
+			Episode = key.Value;
+		}
+
+		public PodcastEpisodeView(string name, PodcastEpisode ep)
+		{
+			PrimaryName = name;
+			Episode = ep;
+		}
+	}
+
+	public class SearchPodcastData : INotifyPropertyChanged
+	{
+		private string _searchString;
+		public string SearchString
+		{
+			get
+			{
+				return _searchString;
+			}
+			set
+			{
+				_searchString = value;
+				NotifyPropertyChanged("SearchString");
+			}
+		}
+
+		private ObservableCollection<PodcastEpisodeView> _results = null;
+		public ObservableCollection<PodcastEpisodeView> SearchResults
+		{
+			get
+			{
+				return _results;
+			}
+			set
+			{
+				_results = value;
+				NotifyPropertyChanged("SearchResults");
+			}
+		}
+
+		private PodcastEpisodeView _currentEpisode = null;
+		public PodcastEpisodeView CurrentEpisode
+		{
+			get
+			{
+				return _currentEpisode;
+			}
+			set
+			{
+				_currentEpisode = value;
+				NotifyPropertyChanged("CurrentEpisode");
+			}
+		}
+
+		public SearchPodcastData()
+		{
+			_searchString = string.Empty;
+			_results = new ObservableCollection<PodcastEpisodeView>();
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+}

@@ -16,34 +16,72 @@
 	</Page.Resources>
 
 	<Grid Style="{StaticResource baseGridStyle}" >
-		<Grid x:Name="errorGrid" Height="40" Width="640" HorizontalAlignment="Center" VerticalAlignment="Top">
-			<Label HorizontalAlignment="Center"  Margin="5" Foreground="Red" Content="{Binding Path=errorMessage}"></Label>
-		</Grid>
-		<Grid x:Name="recentPodcastList" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15" Height="800" Width="800">
-			<ItemsControl Name="podcastListItems" ItemsSource="{Binding Path=RecentList, UpdateSourceTrigger=PropertyChanged}">
-				<ItemsControl.ItemTemplate>
-					<DataTemplate>
-						<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="100" />
-							</Grid.ColumnDefinitions>
-							<WrapPanel>
-								<TextBlock>
-									<TextBlock.Text>
-										<MultiBinding StringFormat="{}{0} - Episode: {1}">
-											<Binding Path="Key" />
-											<Binding Path="Value.EpisodeNumber" />
-										</MultiBinding>
-									</TextBlock.Text>
-								</TextBlock>
-								<Button Margin="5,0,0,0" Visibility="{Binding Path=Value.NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
-								<Button Margin="5,0,0,0" Visibility="{Binding Path=Value.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
+		<StackPanel>
+			<Grid x:Name="podcastInfo" VerticalAlignment="Center">
+				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
+					<Grid x:Name="recentPodcastList" Margin="5">
+						<ItemsControl Name="podcastListItems" ItemsSource="{Binding Path=RecentList}">
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="175" />
+											<ColumnDefinition Width="75" />
+										</Grid.ColumnDefinitions>
+										<TextBlock>
+											<TextBlock.Text>
+												<MultiBinding StringFormat="{}{0} - Episode: {1}">
+													<Binding Path="PrimaryName" />
+													<Binding Path="Episode.EpisodeNumber" />
+												</MultiBinding>
+											</TextBlock.Text>
+										</TextBlock>
+										<Button Margin="5,0,0,0" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked" Grid.Column="1">Download</Button>
+										<Button Margin="5,0,0,0" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Grid.Column="1">Play</Button>
+									</Grid>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Grid>
+				</Border>
+				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top">
+					<Grid x:Name="searchPodcastList" Margin="5">
+						<StackPanel>
+							<WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}"></TextBox>
+								<Button Click="SearchPodcastsClicked">Search</Button>
 							</WrapPanel>
-						</Grid>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</Grid>
+							<ScrollViewer VerticalScrollBarVisibility="Visible">
+								<ItemsControl Name="podcastSearchItems" ItemsSource="{Binding Path=SearchResults}">
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<Grid Style="{StaticResource baseGridStyle}" Background="Transparent" MouseUp="SelectEpisodeClicked">
+												<StackPanel>
+													<TextBlock>
+														<TextBlock.Text>
+															<MultiBinding StringFormat="{}{0} - Episode: {1}">
+																<Binding Path="PrimaryName" />
+																<Binding Path="Episode.EpisodeNumber" />
+															</MultiBinding>
+														</TextBlock.Text>
+													</TextBlock>
+													<TextBlock FontSize="{StaticResource SubFontSize}" Foreground="{StaticResource TextSubForegroundColor}" Text="{Binding Path=Episode.PublishDateUtc, StringFormat=yyyy/MM/dd}"></TextBlock>
+												</StackPanel>
+											</Grid>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</ScrollViewer>
+							<Grid Height="175px"  DataContext="{Binding Path=CurrentEpisode}" Visibility="{Binding Path=CurrentEpisode, Converter={StaticResource NullToVisibilityConverter}}">
+								<Label>test</Label>
+							</Grid>
+						</StackPanel>
+					</Grid>
+				</Border>
+			</Grid>
+			<Grid x:Name="errorGrid" Height="15" HorizontalAlignment="Center" VerticalAlignment="Top">
+				<Label HorizontalAlignment="Center"  Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
+			</Grid>
+		</StackPanel>
 	</Grid>
 </Page>

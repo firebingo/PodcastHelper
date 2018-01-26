@@ -2,6 +2,7 @@
 using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -25,20 +26,28 @@ namespace PodcastHelper.Pages
 	{
 		public Config config;
 		private RecentPodcastListData recentListData = null;
+		private ErrorData errorData = null;
+		private SearchPodcastData searchData = null;
 
 		public MainPage()
 		{
 			InitializeComponent();
 			config = Config.Instance;
 
+			errorData = new ErrorData();
+			errorGrid.DataContext = errorData;
+			ErrorTracker.CurrentError = "test error";
 			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
-			intilizePodcasts().ConfigureAwait(false);
+			initializePodcasts().ConfigureAwait(false);
 		}
 
-		public async Task intilizePodcasts()
+		public async Task initializePodcasts()
 		{
 			recentListData = new RecentPodcastListData();
 			recentPodcastList.DataContext = recentListData;
+			searchData = new SearchPodcastData();
+			searchPodcastList.DataContext = searchData;
+
 			foreach (var pod in config.ConfigObject.PodcastMap.Podcasts)
 			{
 				await pod.Value.CheckForNew();
@@ -50,19 +59,17 @@ namespace PodcastHelper.Pages
 
 		private void OnLatestListUpdate()
 		{
-			if (recentListData.RecentList != null)
-				recentListData.RecentList.Clear();
-			recentListData.RecentList = new Dictionary<string, PodcastEpisode>(PodcastFunctions.LatestPodcastList);
+			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
 		}
 
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
 			var button = sender as Button;
-			if (button?.DataContext is KeyValuePair<string, PodcastEpisode>)
+			if (button?.DataContext is PodcastEpisodeView)
 			{
-				var kvp = ((KeyValuePair<string, PodcastEpisode>)button.DataContext);
-				var podcast = config.ConfigObject.PodcastMap.Podcasts.FirstOrDefault(x => x.Value.PrimaryName == kvp.Key).Value;
-				var ep = kvp.Value.EpisodeNumber;
+				var kvp = ((PodcastEpisodeView)button.DataContext);
+				var podcast = config.ConfigObject.PodcastMap.Podcasts.FirstOrDefault(x => x.Value.PrimaryName == kvp.PrimaryName).Value;
+				var ep = kvp.Episode.EpisodeNumber;
 				if (podcast == null)
 					return;
 				DownloadEpisode(ep, podcast).ConfigureAwait(false);
@@ -71,33 +78,27 @@ namespace PodcastHelper.Pages
 				return;
 		}
 
+		private void SearchPodcastsClicked(object sender, RoutedEventArgs e)
+		{
+			var res = PodcastFunctions.SearchPodcasts(searchData.SearchString);
+			searchData.SearchResults.Clear();
+			searchData.SearchResults = res;
+		}
+
+		public void SelectEpisodeClicked(object sender, RoutedEventArgs e)
+		{
+			var grid = sender as Grid;
+			if(grid != null)
+			{
+				var episode = grid.DataContext as PodcastEpisodeView;
+				if (episode != null)
+					searchData.CurrentEpisode = episode;
+			}
+		}
+
 		private async Task DownloadEpisode(int ep, PodcastDirectory podcast)
 		{
 			await podcast.DownloadEpisode(ep);
-		}
-	}
-
-	public class RecentPodcastListData : INotifyPropertyChanged
-	{
-		Dictionary<string, PodcastEpisode> _list = null;
-		public Dictionary<string, PodcastEpisode> RecentList
-		{
-			get
-			{
-				return _list;
-			}
-			set
-			{
-				_list = value;
-				NotifyPropertyChanged("RecentList");
-			}
-		}
-
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		private void NotifyPropertyChanged(string info)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
 		}
 	}
 }
