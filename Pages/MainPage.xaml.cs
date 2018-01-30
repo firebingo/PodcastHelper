@@ -1,5 +1,6 @@
 ﻿using PodcastHelper.Function;
 using PodcastHelper.Models;
+using PodcastHelper.Resources;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +39,8 @@ namespace PodcastHelper.Pages
 			errorGrid.DataContext = errorData;
 			ErrorTracker.CurrentError = "test error";
 			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
+			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
+			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			initializePodcasts().ConfigureAwait(false);
 		}
 
@@ -54,7 +57,7 @@ namespace PodcastHelper.Pages
 				await pod.Value.FillNewEpisodes();
 				await pod.Value.CheckForDownloadedEpisodes();
 			}
-			PodcastFunctions.UpdateLatestPodcastList();
+			await PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
 		}
 
 		private void OnLatestListUpdate()
@@ -62,7 +65,7 @@ namespace PodcastHelper.Pages
 			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
 		}
 
-		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
+		public void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
 			var button = sender as Button;
 			if (button?.DataContext is PodcastEpisodeView)
@@ -83,6 +86,11 @@ namespace PodcastHelper.Pages
 			var res = PodcastFunctions.SearchPodcasts(searchData.SearchString);
 			searchData.SearchResults.Clear();
 			searchData.SearchResults = res;
+		}
+
+		public void SummaryDownloadClicked(object sender, RoutedEventArgs e)
+		{
+			DownloadRecentClicked(sender, e);
 		}
 
 		public void SelectEpisodeClicked(object sender, RoutedEventArgs e)

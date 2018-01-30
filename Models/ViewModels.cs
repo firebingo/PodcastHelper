@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace PodcastHelper.Models
 {
@@ -153,6 +154,24 @@ namespace PodcastHelper.Models
 			{
 				_currentEpisode = value;
 				NotifyPropertyChanged("CurrentEpisode");
+				NotifyPropertyChanged("ShowCurrent");
+				NotifyPropertyChanged("MaxHeight");
+			}
+		}
+
+		public Visibility ShowCurrent
+		{
+			get
+			{
+				return _currentEpisode == null ? Visibility.Hidden : Visibility.Visible;
+			}
+		}
+
+		public int MaxHeight
+		{
+			get
+			{
+				return ShowCurrent == Visibility.Visible ? 125 : 300;
 			}
 		}
 

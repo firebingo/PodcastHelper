@@ -37,7 +37,8 @@ namespace PodcastHelper.Models
 		public int MinEpisodeCount { get; set; }
 		public int MaxEpisodeCount { get; set; }
 		public int LatestEpisode { get; set; }
-		private bool _hasLatest;
+		public int LastPlayed { get; set; }
+		//private bool _hasLatest;
 		private SyndicationFeed _feedCache;
 		private Dictionary<int, PodcastEpisode> _episodes;
 
@@ -61,7 +62,8 @@ namespace PodcastHelper.Models
 			MinEpisodeCount = 0;
 			MaxEpisodeCount = int.MaxValue;
 			LatestEpisode = 0;
-			_hasLatest = false;
+			LastPlayed = 0;
+			//_hasLatest = false;
 			_episodes = null;
 		}
 
@@ -114,7 +116,7 @@ namespace PodcastHelper.Models
 				if (newestEpisode > highestCurrent)
 				{
 					LatestEpisode = newestEpisode;
-					_hasLatest = false;
+					//_hasLatest = false;
 				}
 
 				Config.Instance.SaveConfig();
@@ -128,7 +130,7 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		public async Task CheckForDownloadedEpisodes()
+		public Task CheckForDownloadedEpisodes()
 		{
 			var files = GetRootAndOneSubFiles(Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath));
 			foreach (var ep in _episodes)
@@ -138,6 +140,7 @@ namespace PodcastHelper.Models
 				else
 					ep.Value.IsDownloaded = false;
 			}
+			return Task.FromResult(0);
 		}
 
 		public async Task FillNewEpisodes()
@@ -153,16 +156,38 @@ namespace PodcastHelper.Models
 				var num = HelperMethods.ParseEpisodeNumber(f.Title.Text);
 				Uri enclosure = null;
 				if (f.Links != null)
-				{
 					enclosure = f.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
+
+				List<string> keywords = null;
+				TimeSpan duration = new TimeSpan();
+				foreach(var ext in f.ElementExtensions)
+				{
+					switch(ext.OuterName.ToLowerInvariant())
+					{
+						case "keywords":
+							keywords = HelperMethods.ReadKeywords(ext);
+							break;
+						case "duration":
+							duration = HelperMethods.ReadDuration(ext);
+							break;
+					}
 				}
+
 				if (num != -1 && num >= MinEpisodeCount)
 				{
 					if (!_episodes.ContainsKey(num))
 					{
-						var episode = new PodcastEpisode() { PodcastShortCode = ShortCode, EpisodeNumber = num, PublishDateUtc = f.PublishDate.UtcDateTime };
+						var episode = new PodcastEpisode() {
+							PodcastShortCode = ShortCode,
+							EpisodeNumber = num,
+							Title = f.Title?.Text,
+							Description = f.Summary?.Text,
+							PublishDateUtc = f.PublishDate.UtcDateTime,
+							Keywords = keywords.ToArray()
+						};
 						if (enclosure != null)
 							episode.FileUri = enclosure;
+						episode.Progress.Length = duration;
 						_episodes.Add(num, episode);
 						addedNew = true;
 					}
@@ -173,7 +198,7 @@ namespace PodcastHelper.Models
 				Config.Instance.SaveConfig();
 		}
 
-		public async Task<bool> DownloadEpisode(int episode)
+		public Task<bool> DownloadEpisode(int episode)
 		{
 			var info = new FileDownloadInfo();
 			if(_episodes.ContainsKey(episode))
@@ -185,10 +210,10 @@ namespace PodcastHelper.Models
 				info.epNumber = episode;
 				info.podcastShortCode = ShortCode;
 				FileDownloader.AddFile(info);
-				FileDownloader.onDownloadFinishedEvent += OnFinishDownloading;
-				return true;
+				FileDownloader.OnDownloadFinishedEvent += OnFinishDownloading;
+				return Task.FromResult(true);
 			}
-			return false;
+			return Task.FromResult(false);
 		}
 
 		private void OnFinishDownloading(bool res, int ep, string shortCode)
@@ -197,11 +222,11 @@ namespace PodcastHelper.Models
 				return;
 			var episodeToUse = _episodes[ep];
 			episodeToUse.IsDownloaded = res;
-			FileDownloader.onDownloadFinishedEvent -= OnFinishDownloading;
-			PodcastFunctions.UpdateLatestPodcastList();
+			FileDownloader.OnDownloadFinishedEvent -= OnFinishDownloading;
+			PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
 		}
 
-		private async Task GetFeed()
+		private Task GetFeed()
 		{
 			XmlReader reader = null;
 			SyndicationFeed feed = null;
@@ -211,10 +236,12 @@ namespace PodcastHelper.Models
 				feed = SyndicationFeed.Load(reader);
 				reader.Close();
 				_feedCache = feed;
+				return Task.FromResult(0);
 			}
 			catch (Exception ex)
 			{
-				return;
+				ErrorTracker.CurrentError = ex.Message;
+				return Task.FromException(ex);
 			}
 		}
 
@@ -252,8 +279,10 @@ namespace PodcastHelper.Models
 		public Uri FileUri { get; set; }
 		public int WatchCount { get; set; }
 		public bool IsDownloaded { get; set; }
+		public string Description { get; set; }
 		public DateTime PublishDateUtc { get; set; }
 		public EpisodeProgress Progress { get; set; }
+		public string[] Keywords { get; set; }
 
 		public string FileName
 		{
@@ -275,6 +304,7 @@ namespace PodcastHelper.Models
 			FileUri = null;
 			IsDownloaded = false;
 			PublishDateUtc = DateTime.MinValue;
+			Keywords = new string[0];
 		}
 	}
 
@@ -283,6 +313,24 @@ namespace PodcastHelper.Models
 		public double Progress { get; set; }
 		public TimeSpan Length { get; set; }
 		public bool HasStarted { get; set; }
+
+		[JsonIgnore]
+		public TimeSpan ProgressTime
+		{
+			get
+			{
+				return new TimeSpan(Convert.ToInt64(Length.Ticks * Progress));
+			}
+		}
+
+		[JsonIgnore]
+		public bool IsAtStart
+		{
+			get
+			{
+				return Progress.Equals(0.0);
+			}
+		}
 
 		public EpisodeProgress()
 		{

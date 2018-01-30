@@ -11,6 +11,7 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="../Resources/Styles.xaml"/>
 				<ResourceDictionary Source="../Resources/Controls.xaml"/>
+				<ResourceDictionary Source="../Resources/ItemsControlTemplates.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Page.Resources>
@@ -20,28 +21,7 @@
 			<Grid x:Name="podcastInfo" VerticalAlignment="Center">
 				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
 					<Grid x:Name="recentPodcastList" Margin="5">
-						<ItemsControl Name="podcastListItems" ItemsSource="{Binding Path=RecentList}">
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
-										<Grid.ColumnDefinitions>
-											<ColumnDefinition Width="175" />
-											<ColumnDefinition Width="75" />
-										</Grid.ColumnDefinitions>
-										<TextBlock>
-											<TextBlock.Text>
-												<MultiBinding StringFormat="{}{0} - Episode: {1}">
-													<Binding Path="PrimaryName" />
-													<Binding Path="Episode.EpisodeNumber" />
-												</MultiBinding>
-											</TextBlock.Text>
-										</TextBlock>
-										<Button Margin="5,0,0,0" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked" Grid.Column="1">Download</Button>
-										<Button Margin="5,0,0,0" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Grid.Column="1">Play</Button>
-									</Grid>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
+						<ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
 					</Grid>
 				</Border>
 				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top">
@@ -51,30 +31,32 @@
 								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}"></TextBox>
 								<Button Click="SearchPodcastsClicked">Search</Button>
 							</WrapPanel>
-							<ScrollViewer VerticalScrollBarVisibility="Visible">
-								<ItemsControl Name="podcastSearchItems" ItemsSource="{Binding Path=SearchResults}">
-									<ItemsControl.ItemTemplate>
-										<DataTemplate>
-											<Grid Style="{StaticResource baseGridStyle}" Background="Transparent" MouseUp="SelectEpisodeClicked">
-												<StackPanel>
-													<TextBlock>
-														<TextBlock.Text>
-															<MultiBinding StringFormat="{}{0} - Episode: {1}">
-																<Binding Path="PrimaryName" />
-																<Binding Path="Episode.EpisodeNumber" />
-															</MultiBinding>
-														</TextBlock.Text>
-													</TextBlock>
-													<TextBlock FontSize="{StaticResource SubFontSize}" Foreground="{StaticResource TextSubForegroundColor}" Text="{Binding Path=Episode.PublishDateUtc, StringFormat=yyyy/MM/dd}"></TextBlock>
-												</StackPanel>
-											</Grid>
-										</DataTemplate>
-									</ItemsControl.ItemTemplate>
-								</ItemsControl>
+							<ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="{Binding Path=MaxHeight}" MinHeight="125">
+								<ItemsControl Name="podcastSearchItems" Template="{StaticResource ResourceKey=SearchListTemplate}"></ItemsControl>
 							</ScrollViewer>
-							<Grid Height="175px"  DataContext="{Binding Path=CurrentEpisode}" Visibility="{Binding Path=CurrentEpisode, Converter={StaticResource NullToVisibilityConverter}}">
-								<Label>test</Label>
-							</Grid>
+							<Border Height="175px" BorderThickness="0,1,0,0" Visibility="{Binding Path=DataContext.ShowCurrent, RelativeSource={RelativeSource AncestorType={x:Type Grid}}}" DataContext="{Binding Path=CurrentEpisode}">
+								<Grid Height="175px" Margin="0,10,0,0">
+									<StackPanel>
+										<TextBlock Text="{Binding Path=Episode.Title, StringFormat=Title: {0}}"></TextBlock>
+										<TextBlock>
+											<TextBlock.Text>
+												<MultiBinding StringFormat="{}Release Date: {0:yyyy/MM/dd}">
+													<Binding Path="Episode.PublishDateUtc"/>
+												</MultiBinding>
+											</TextBlock.Text>
+										</TextBlock>
+										<TextBlock Text="{Binding Path=Episode.Description, StringFormat=Description: {0}}" TextWrapping="Wrap" MaxHeight="30"></TextBlock>
+										<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>
+										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0}}"></TextBlock>
+										<WrapPanel>
+											<Button Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
+											<Button Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
+											<Button Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
+											<Button>Close</Button>
+										</WrapPanel>
+									</StackPanel>
+								</Grid>
+							</Border>
 						</StackPanel>
 					</Grid>
 				</Border>

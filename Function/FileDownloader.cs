@@ -15,7 +15,7 @@ namespace PodcastHelper.Function
 		private static bool _runThread = true;
 		private static WebClient _webClient;
 		public delegate void onDownloadFinished(bool res, int ep, string shortCode);
-		public static event onDownloadFinished onDownloadFinishedEvent;
+		public static event onDownloadFinished OnDownloadFinishedEvent;
 
 		static FileDownloader()
 		{
@@ -39,7 +39,7 @@ namespace PodcastHelper.Function
 		{
 			do
 			{
-				Thread.Sleep(2000);
+				Thread.Sleep(500);
 				if(_queue.Count > 0)
 				{
 					_downloadingFile = _queue.Dequeue();
@@ -53,13 +53,13 @@ namespace PodcastHelper.Function
 
 							_webClient.DownloadFile(_downloadingFile.FileUri, _downloadingFile.FilePath);
 							if (File.Exists(_downloadingFile.FilePath))
-								onDownloadFinishedEvent?.Invoke(true, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+								OnDownloadFinishedEvent?.Invoke(true, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
 							else
-								onDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+								OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
 						}
 						catch (Exception ex)
 						{
-							onDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
+							OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.epNumber, _downloadingFile.podcastShortCode);
 							ErrorTracker.CurrentError = ex.Message;
 						}
 					}
@@ -73,6 +73,8 @@ namespace PodcastHelper.Function
 		public static void Kill()
 		{
 			_runThread = false;
+			if(_downloadingFile != null)
+				_doThread.Abort();
 		}
 
 		public static void AddFile(FileDownloadInfo info)

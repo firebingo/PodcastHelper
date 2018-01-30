@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Syndication;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -30,6 +31,49 @@ namespace PodcastHelper.Helpers
 				{
 					return p;
 				}
+			}
+
+			return ret;
+		}
+
+		public static List<string> ReadKeywords(SyndicationElementExtension ele)
+		{
+			var ret = new List<string>();
+
+			var reader = ele.GetReader();
+			while (reader.Read())
+			{
+				if (!string.IsNullOrWhiteSpace(reader.Value))
+				{
+					var value = reader.Value;
+					var split = value.Split(',');
+					if (split.Length > 0)
+					{
+						foreach (var s in split)
+						{
+							ret.Add(s);
+						}
+					}
+					else
+					{
+						ret.Add(reader.Value);
+					}
+				}
+			}
+
+			return ret;
+		}
+
+		public static TimeSpan ReadDuration(SyndicationElementExtension ele)
+		{
+			var ret = new TimeSpan();
+
+			var reader = ele.GetReader();
+			reader.Read();
+			if (!string.IsNullOrWhiteSpace(reader.Value))
+			{
+				if(TimeSpan.TryParse(reader.Value, out ret))
+					return ret;
 			}
 
 			return ret;

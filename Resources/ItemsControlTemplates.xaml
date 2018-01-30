@@ -1,0 +1,56 @@
+﻿<ResourceDictionary x:Class="PodcastHelper.Resources.ItemsControlTemplates"
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+	<ResourceDictionary.MergedDictionaries>
+		<ResourceDictionary Source="Styles.xaml"/>
+		<ResourceDictionary Source="Controls.xaml"/>
+	</ResourceDictionary.MergedDictionaries>
+
+	<ControlTemplate x:Key ="RecentListTemplate" TargetType="{x:Type ItemsControl}">
+		<ItemsControl Name="podcastListItems" ItemsSource="{Binding Path=RecentList}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="175" />
+							<ColumnDefinition Width="75" />
+						</Grid.ColumnDefinitions>
+						<TextBlock>
+							<TextBlock.Text>
+								<MultiBinding StringFormat="{}{0} - Episode: {1}">
+									<Binding Path="PrimaryName" />
+									<Binding Path="Episode.EpisodeNumber" />
+								</MultiBinding>
+							</TextBlock.Text>
+						</TextBlock>
+						<Button Margin="5,0,0,0" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked" Grid.Column="1">Download</Button>
+						<Button Margin="5,0,0,0" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Grid.Column="1">Play</Button>
+					</Grid>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</ControlTemplate>
+
+	<ControlTemplate x:Key ="SearchListTemplate" TargetType="{x:Type ItemsControl}">
+		<ItemsControl Name="podcastSearchItems" ItemsSource="{Binding Path=SearchResults}">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Grid Style="{StaticResource baseGridStyle}" Background="Transparent" MouseUp="SelectEpisodeClicked">
+						<StackPanel>
+							<TextBlock>
+								<TextBlock.Text>
+									<MultiBinding StringFormat="{}{0} - Episode: {1}">
+										<Binding Path="PrimaryName" />
+										<Binding Path="Episode.EpisodeNumber" />
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+							<TextBlock FontSize="{StaticResource SubFontSize}" Foreground="{StaticResource TextSubForegroundColor}" Text="{Binding Path=Episode.PublishDateUtc, StringFormat=yyyy/MM/dd}"></TextBlock>
+						</StackPanel>
+					</Grid>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</ControlTemplate>
+</ResourceDictionary>

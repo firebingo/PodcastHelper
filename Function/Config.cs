@@ -53,7 +53,7 @@ namespace PodcastHelper.Function
 			}
 			catch (Exception ex)
 			{
-
+				ErrorTracker.CurrentError = ex.Message;
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace PodcastHelper.Function
 			}
 			catch (Exception ex)
 			{
-
+				ErrorTracker.CurrentError = ex.Message;
 			}
 		}
 	}

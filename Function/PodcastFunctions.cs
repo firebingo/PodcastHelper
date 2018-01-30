@@ -26,7 +26,7 @@ namespace PodcastHelper.Function
 			}
 		}
 
-		public static async Task LoadLatestPodcastList()
+		public static Task LoadLatestPodcastList()
 		{
 			_latestPodcastCache.Clear();
 			var pMap = Config.Instance.ConfigObject.PodcastMap;
@@ -38,6 +38,7 @@ namespace PodcastHelper.Function
 				}
 				catch { }
 			}
+			return Task.FromResult(0);
 		}
 
 		public static async Task UpdateLatestPodcastList()
@@ -55,11 +56,26 @@ namespace PodcastHelper.Function
 			{
 				foreach(var episode in podcast.Value)
 				{
-					if(episode.Value.FileName.ContainsInvariant(searchString) || episode.Value.EpisodeNumber.ToString().ContainsInvariant(searchString) || episode.Value.Title.ContainsInvariant(searchString))
+					var contains = false;
+					if (episode.Value.FileName.ContainsInvariant(searchString) || episode.Value.EpisodeNumber.ToString().ContainsInvariant(searchString) 
+						|| episode.Value.Title.ContainsInvariant(searchString) || episode.Value.Description.ContainsInvariant(searchString))
+						contains = true;
+
+					foreach(var s in episode.Value.Keywords)
 					{
-						if(config.ConfigObject.PodcastMap.Podcasts.ContainsKey(episode.Value.PodcastShortCode))
+						if(s.ContainsInvariant(searchString))
+						{
+							contains = true;
+							break;
+						}
+					}
+
+					if (contains)
+					{
+						if (config.ConfigObject.PodcastMap.Podcasts.ContainsKey(episode.Value.PodcastShortCode))
 							result.Add(new PodcastEpisodeView(config.ConfigObject.PodcastMap.Podcasts[episode.Value.PodcastShortCode].PrimaryName, episode.Value));
 					}
+					
 				}
 			}
 
