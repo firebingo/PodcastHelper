@@ -42,6 +42,7 @@ namespace PodcastHelper.Pages
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			initializePodcasts().ConfigureAwait(false);
+			ErrorTracker.CurrentError = "TEST ERROR";
 		}
 
 		public async Task initializePodcasts()
@@ -86,6 +87,11 @@ namespace PodcastHelper.Pages
 			var res = PodcastFunctions.SearchPodcasts(searchData.SearchString);
 			searchData.SearchResults.Clear();
 			searchData.SearchResults = res;
+		}
+
+		private void CloseSearchSummary(object sender, RoutedEventArgs e)
+		{
+			searchData.CurrentEpisode = null;
 		}
 
 		public void SummaryDownloadClicked(object sender, RoutedEventArgs e)

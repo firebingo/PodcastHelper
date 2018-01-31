@@ -49,10 +49,10 @@
 										<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>
 										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0}}"></TextBlock>
 										<WrapPanel>
-											<Button Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
-											<Button Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
-											<Button Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
-											<Button>Close</Button>
+											<Button Margin="5,0,5,5" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
+											<Button Margin="5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play</Button>
+											<Button Margin="5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }">Play Start</Button>
+											<Button Margin="5" HorizontalAlignment="Right" Click="CloseSearchSummary">Close</Button>
 										</WrapPanel>
 									</StackPanel>
 								</Grid>
@@ -61,8 +61,8 @@
 					</Grid>
 				</Border>
 			</Grid>
-			<Grid x:Name="errorGrid" Height="15" HorizontalAlignment="Center" VerticalAlignment="Top">
-				<Label HorizontalAlignment="Center"  Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
+			<Grid x:Name="errorGrid" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+				<Label HorizontalAlignment="Center" FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
 			</Grid>
 		</StackPanel>
 	</Grid>

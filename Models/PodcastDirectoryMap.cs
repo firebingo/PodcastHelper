@@ -207,8 +207,8 @@ namespace PodcastHelper.Models
 				episodeToUse.IsDownloaded = false;
 				info.FileUri = episodeToUse.FileUri.ToString();
 				info.FilePath = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath, episodeToUse.PublishDateUtc.Year.ToString(), episodeToUse.FileName);
-				info.epNumber = episode;
-				info.podcastShortCode = ShortCode;
+				info.EpNumber = episode;
+				info.PodcastShortCode = ShortCode;
 				FileDownloader.AddFile(info);
 				FileDownloader.OnDownloadFinishedEvent += OnFinishDownloading;
 				return Task.FromResult(true);

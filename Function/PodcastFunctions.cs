@@ -47,9 +47,9 @@ namespace PodcastHelper.Function
 			UpdateLatestList?.Invoke();
 		}
 
-		public static ObservableCollection<PodcastEpisodeView> SearchPodcasts(string searchString)
+		public static List<PodcastEpisodeView> SearchPodcasts(string searchString)
 		{
-			var result = new ObservableCollection<PodcastEpisodeView>();
+			var result = new List<PodcastEpisodeView>();
 			var config = Config.Instance;
 
 			foreach(var podcast in config.EpisodeList.Episodes)
@@ -75,7 +75,6 @@ namespace PodcastHelper.Function
 						if (config.ConfigObject.PodcastMap.Podcasts.ContainsKey(episode.Value.PodcastShortCode))
 							result.Add(new PodcastEpisodeView(config.ConfigObject.PodcastMap.Podcasts[episode.Value.PodcastShortCode].PrimaryName, episode.Value));
 					}
-					
 				}
 			}
 

@@ -45,8 +45,10 @@ namespace PodcastHelper.Models
 
 	public class RecentPodcastListData : INotifyPropertyChanged
 	{
-		ObservableCollection<PodcastEpisodeView> _list = null;
-		public ObservableCollection<PodcastEpisodeView> RecentList
+		private object ListLock = new object();
+
+		List<PodcastEpisodeView> _list = null;
+		public List<PodcastEpisodeView> RecentList
 		{
 			get
 			{
@@ -54,24 +56,31 @@ namespace PodcastHelper.Models
 			}
 			set
 			{
-				_list = value;
+				lock (ListLock)
+				{
+					_list.Clear();
+					_list = value;
+				}
 				NotifyPropertyChanged("RecentList");
 			}
 		}
 
 		public RecentPodcastListData()
 		{
-			_list = new ObservableCollection<PodcastEpisodeView>();
+			_list = new List<PodcastEpisodeView>();
 		}
 
 		public void UpdateRecentList(Dictionary<string, PodcastEpisode> list)
 		{
 			try
 			{
-				_list.Clear();
-				foreach (var item in list)
+				lock (ListLock)
 				{
-					_list.Add(new PodcastEpisodeView(item));
+					_list = new List<PodcastEpisodeView>();
+					foreach (var item in list)
+					{
+						_list.Add(new PodcastEpisodeView(item));
+					}
 				}
 				NotifyPropertyChanged("RecentList");
 			}
@@ -129,8 +138,8 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		private ObservableCollection<PodcastEpisodeView> _results = null;
-		public ObservableCollection<PodcastEpisodeView> SearchResults
+		private List<PodcastEpisodeView> _results = null;
+		public List<PodcastEpisodeView> SearchResults
 		{
 			get
 			{
@@ -178,7 +187,7 @@ namespace PodcastHelper.Models
 		public SearchPodcastData()
 		{
 			_searchString = string.Empty;
-			_results = new ObservableCollection<PodcastEpisodeView>();
+			_results = new List<PodcastEpisodeView>();
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
