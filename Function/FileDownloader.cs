@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PodcastHelper.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -59,7 +60,7 @@ namespace PodcastHelper.Function
 							if (!Directory.Exists(path))
 								Directory.CreateDirectory(path);
 
-							ProcessFileRequest().ConfigureAwait(false);
+							RunFileRequest().ConfigureAwait(false);
 						}
 						catch (Exception ex)
 						{
@@ -72,7 +73,7 @@ namespace PodcastHelper.Function
 				{
 					try
 					{
-						OnDownloadUpdateEvent?.Invoke(_downloadingFile.PodcastShortCode, _downloadingFile.EpNumber, _downloadingStream.Length / _downloadingStream.Position);
+						//OnDownloadUpdateEvent?.Invoke(_downloadingFile.PodcastShortCode, _downloadingFile.EpNumber, _downloadingStream.Length / _downloadingStream.Position);
 					}
 					catch { }
 				}
@@ -94,6 +95,29 @@ namespace PodcastHelper.Function
 			_queue.Enqueue(info);
 		}
 
+		private static async Task RunFileRequest()
+		{
+			try
+			{
+				await Task.Run(() => ProcessFileRequest()).TimeoutAfter(45000);
+
+				if (File.Exists(_downloadingFile.FilePath))
+					OnDownloadFinishedEvent?.Invoke(true, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
+				else
+					OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
+			}
+			catch(Exception ex)
+			{
+				OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
+				ErrorTracker.CurrentError = ex.Message;
+			}
+			finally
+			{
+				_downloadingStream = null;
+				_downloadingFile = null;
+			}
+		}
+
 		private static async Task ProcessFileRequest()
 		{
 			try
@@ -107,19 +131,10 @@ namespace PodcastHelper.Function
 						await _downloadingStream.CopyToAsync(fileStream);
 					}
 				}
-				_downloadingStream = null;			
-
-				if (File.Exists(_downloadingFile.FilePath))
-					OnDownloadFinishedEvent?.Invoke(true, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
-				else
-					OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
-
-				_downloadingFile = null;
 			}
-			catch(Exception ex)
+			catch
 			{
-				_downloadingFile = null;
-				ErrorTracker.CurrentError = ex.Message;
+				throw;
 			}
 		}
 	}

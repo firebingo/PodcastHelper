@@ -87,4 +87,15 @@ namespace PodcastHelper.Helpers
 			return str.IndexOf(innerText, StringComparison.InvariantCultureIgnoreCase) != -1;
 		}
 	}
+
+	public static class Task_ExtensionMethods
+	{
+		public static async Task TimeoutAfter(this Task task, int millisecondsTimeout)
+		{
+			if (task == await Task.WhenAny(task, Task.Delay(millisecondsTimeout)))
+				await task;
+			else
+				throw new TimeoutException();
+		}
+	}
 }

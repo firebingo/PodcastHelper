@@ -37,12 +37,10 @@ namespace PodcastHelper.Pages
 
 			errorData = new ErrorData();
 			errorGrid.DataContext = errorData;
-			ErrorTracker.CurrentError = "test error";
 			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			initializePodcasts().ConfigureAwait(false);
-			ErrorTracker.CurrentError = "TEST ERROR";
 		}
 
 		public async Task initializePodcasts()
@@ -76,7 +74,7 @@ namespace PodcastHelper.Pages
 				var ep = kvp.Episode.EpisodeNumber;
 				if (podcast == null)
 					return;
-				DownloadEpisode(ep, podcast).ConfigureAwait(false);
+				PodcastFunctions.DownloadEpisode(ep, podcast).ConfigureAwait(false);
 			}
 			else
 				return;
@@ -110,9 +108,28 @@ namespace PodcastHelper.Pages
 			}
 		}
 
-		private async Task DownloadEpisode(int ep, PodcastDirectory podcast)
+		private void SummaryPlayClicked(object sender, RoutedEventArgs e)
 		{
-			await podcast.DownloadEpisode(ep);
+			var button = sender as Button;
+			if (button?.DataContext is PodcastEpisodeView)
+			{
+				var kvp = ((PodcastEpisodeView)button.DataContext);
+				PodcastFunctions.PlayFile(kvp, false).ConfigureAwait(false);
+			}
+			else
+				return;
+		}
+
+		private void SummaryPlayStartClicked(object sender, RoutedEventArgs e)
+		{
+			var button = sender as Button;
+			if (button?.DataContext is PodcastEpisodeView)
+			{
+				var kvp = ((PodcastEpisodeView)button.DataContext);
+				PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
+			}
+			else
+				return;
 		}
 	}
 }

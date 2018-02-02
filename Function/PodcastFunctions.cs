@@ -3,6 +3,7 @@ using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PodcastHelper.Function
@@ -79,6 +80,20 @@ namespace PodcastHelper.Function
 			}
 
 			return result;
+		}
+
+		public static async Task DownloadEpisode(int ep, PodcastDirectory podcast)
+		{
+			await podcast.DownloadEpisode(ep);
+		}
+
+		public static async Task PlayFile(PodcastEpisodeView ep, bool fromStart = false)
+		{
+			var podcast = Config.Instance.ConfigObject.PodcastMap.Podcasts.FirstOrDefault(x => x.Value.PrimaryName == ep.PrimaryName).Value;
+			if (podcast == null)
+				return;
+			var path = System.IO.Path.Combine(Config.Instance.ConfigObject.RootPath, podcast.FolderPath, ep.Episode.PublishDateUtc.Year.ToString(), ep.Episode.FileName);
+			await VlcApi.PlayFile(path);
 		}
 	}
 }

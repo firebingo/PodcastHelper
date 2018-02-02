@@ -180,7 +180,7 @@ namespace PodcastHelper.Models
 		{
 			get
 			{
-				return ShowCurrent == Visibility.Visible ? 125 : 300;
+				return ShowCurrent == Visibility.Visible ? 115 : 260;
 			}
 		}
 
