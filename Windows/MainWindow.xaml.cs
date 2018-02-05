@@ -30,6 +30,7 @@ namespace PodcastHelper.Windows
 		private void WindowClosing(object sender, CancelEventArgs e)
 		{
 			FileDownloader.Kill();
+			VlcApi.Kill();
 		}
 	}
 }

@@ -40,6 +40,7 @@ namespace PodcastHelper.Pages
 			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
+			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
 			initializePodcasts().ConfigureAwait(false);
 		}
 
@@ -64,7 +65,7 @@ namespace PodcastHelper.Pages
 			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
 		}
 
-		public void DownloadRecentClicked(object sender, RoutedEventArgs e)
+		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
 			var button = sender as Button;
 			if (button?.DataContext is PodcastEpisodeView)
@@ -75,6 +76,18 @@ namespace PodcastHelper.Pages
 				if (podcast == null)
 					return;
 				PodcastFunctions.DownloadEpisode(ep, podcast).ConfigureAwait(false);
+			}
+			else
+				return;
+		}
+
+		private void PlayRecentClicked(object sender, RoutedEventArgs e)
+		{
+			var button = sender as Button;
+			if (button?.DataContext is PodcastEpisodeView)
+			{
+				var kvp = ((PodcastEpisodeView)button.DataContext);
+				PodcastFunctions.PlayFile(kvp, false).ConfigureAwait(false);
 			}
 			else
 				return;

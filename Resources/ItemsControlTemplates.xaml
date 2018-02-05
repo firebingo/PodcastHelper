@@ -25,7 +25,7 @@
 							</TextBlock.Text>
 						</TextBlock>
 						<Button Margin="5,0,0,0" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked" Grid.Column="1">Download</Button>
-						<Button Margin="5,0,0,0" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Grid.Column="1">Play</Button>
+						<Button Margin="5,0,0,0" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Click="PlayRecentClicked"  Grid.Column="1">Play</Button>
 					</Grid>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>

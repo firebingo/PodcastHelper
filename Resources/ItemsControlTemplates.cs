@@ -15,6 +15,9 @@ namespace PodcastHelper.Resources
 		public delegate void SelectEpisodeDel(object sender, RoutedEventArgs e);
 		public static event SelectEpisodeDel OnSelectEpisodeEvent;
 
+		public delegate void PlayEpisodeDel(object sender, RoutedEventArgs e);
+		public static event PlayEpisodeDel OnPlayEpisodeEvent;
+
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
 			OnDownloadRecentEvent?.Invoke(sender, e);
@@ -23,6 +26,11 @@ namespace PodcastHelper.Resources
 		private void SelectEpisodeClicked(object sender, RoutedEventArgs e)
 		{
 			OnSelectEpisodeEvent?.Invoke(sender, e);
+		}
+
+		private void PlayRecentClicked(object sender, RoutedEventArgs e)
+		{
+			OnPlayEpisodeEvent?.Invoke(sender, e);
 		}
 	}
 }

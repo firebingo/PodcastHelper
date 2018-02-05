@@ -5,6 +5,7 @@ using System.ServiceModel.Syndication;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace PodcastHelper.Helpers
 {
@@ -74,6 +75,26 @@ namespace PodcastHelper.Helpers
 			{
 				if(TimeSpan.TryParse(reader.Value, out ret))
 					return ret;
+			}
+
+			return ret;
+		}
+
+		public static string FindXmlAttribute(XmlNode node, string ToFind)
+		{
+			var ret = string.Empty;
+
+			var atts = node.Attributes;
+			if (atts != null && atts.Count > 0)
+			{
+				foreach (XmlAttribute att in atts)
+				{
+					if (att.Name.ToLowerInvariant() == ToFind)
+					{
+						ret = att.Value;
+						break;
+					}
+				}
 			}
 
 			return ret;
