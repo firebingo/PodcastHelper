@@ -2,7 +2,6 @@
 using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,11 +11,15 @@ namespace PodcastHelper.Function
 	{
 		private static Dictionary<string, PodcastEpisode> _latestPodcastCache;
 		public delegate void OnUpdate();
-		public static event OnUpdate UpdateLatestList;
+		public static event OnUpdate UpdateLatestListEvent;
+
+		private static Dictionary<string, PodcastEpisode> _latestPlayedCache;
+		public static event OnUpdate UpdateLatestPlayedListEvent;
 
 		static PodcastFunctions()
 		{
 			_latestPodcastCache = new Dictionary<string, PodcastEpisode>();
+			_latestPlayedCache = new Dictionary<string, PodcastEpisode>();
 		}
 
 		public static Dictionary<string, PodcastEpisode> LatestPodcastList
@@ -24,6 +27,14 @@ namespace PodcastHelper.Function
 			get
 			{
 				return _latestPodcastCache;
+			}
+		}
+
+		public static Dictionary<string, PodcastEpisode> LatestPlayedList
+		{
+			get
+			{
+				return _latestPlayedCache;
 			}
 		}
 
@@ -45,7 +56,29 @@ namespace PodcastHelper.Function
 		public static async Task UpdateLatestPodcastList()
 		{
 			await LoadLatestPodcastList();
-			UpdateLatestList?.Invoke();
+			UpdateLatestListEvent?.Invoke();
+		}
+
+		public static Task LoadLatestPlayedList()
+		{
+			_latestPlayedCache.Clear();
+			var pMap = Config.Instance.ConfigObject.PodcastMap;
+			var episodes = Config.Instance.EpisodeList.Episodes;
+			foreach (var podcast in pMap.Podcasts)
+			{
+				if (podcast.Value.LastPlayed < 1 || !episodes.ContainsKey(podcast.Value.ShortCode) || !episodes[podcast.Value.ShortCode].ContainsKey(podcast.Value.LastPlayed))
+					continue;
+				var ep = episodes[podcast.Value.ShortCode][podcast.Value.LastPlayed];
+				if (ep != null)
+					_latestPlayedCache.Add(podcast.Value.PrimaryName, ep);
+			}
+			return Task.FromResult(0);
+		}
+
+		public static async Task UpdateLatestPlayedList()
+		{
+			await LoadLatestPlayedList();
+			UpdateLatestPlayedListEvent?.Invoke();
 		}
 
 		public static List<PodcastEpisodeView> SearchPodcasts(string searchString)
@@ -93,7 +126,14 @@ namespace PodcastHelper.Function
 			if (podcast == null)
 				return;
 			var path = System.IO.Path.Combine(Config.Instance.ConfigObject.RootPath, podcast.FolderPath, ep.Episode.PublishDateUtc.Year.ToString(), ep.Episode.FileName);
-			await VlcApi.PlayFile(path);
+			var seconds = 0;
+			if (!fromStart)
+				seconds = Convert.ToInt32(ep.Episode.Progress.ProgressTime.TotalSeconds);
+
+			await VlcApi.PlayFile(path, seconds);
+
+			podcast.LastPlayed = ep.Episode.EpisodeNumber;
+			UpdateLatestPlayedList();
 		}
 	}
 }

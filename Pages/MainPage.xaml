@@ -21,7 +21,16 @@
 			<Grid x:Name="podcastInfo" VerticalAlignment="Center">
 				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
 					<Grid x:Name="recentPodcastList" Margin="5">
-						<ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
+						<StackPanel>
+							<TextBlock Height="20" Text="New Podcasts:"></TextBlock>
+							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="130" MaxHeight="130">
+								<ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
+							</ScrollViewer>
+							<TextBlock Height="20" Text="Recently Played:"></TextBlock>
+							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="130" MaxHeight="130">
+								<ItemsControl Name="podcastRecentPlayedItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
+							</ScrollViewer>
+						</StackPanel>
 					</Grid>
 				</Border>
 				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top">

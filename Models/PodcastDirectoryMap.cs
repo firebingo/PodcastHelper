@@ -312,7 +312,6 @@ namespace PodcastHelper.Models
 	{
 		public double Progress { get; set; }
 		public TimeSpan Length { get; set; }
-		public bool HasStarted { get; set; }
 
 		[JsonIgnore]
 		public TimeSpan ProgressTime
@@ -336,7 +335,6 @@ namespace PodcastHelper.Models
 		{
 			Progress = 0.0;
 			Length = new TimeSpan(0);
-			HasStarted = false;
 		}
 	}
 }

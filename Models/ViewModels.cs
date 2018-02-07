@@ -1,7 +1,6 @@
 ﻿using PodcastHelper.Function;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -85,6 +84,60 @@ namespace PodcastHelper.Models
 				NotifyPropertyChanged("RecentList");
 			}
 			catch(Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+
+	public class RecentPlayedListData : INotifyPropertyChanged
+	{
+		private object ListLock = new object();
+
+		List<PodcastEpisodeView> _list = null;
+		public List<PodcastEpisodeView> RecentList
+		{
+			get
+			{
+				return _list;
+			}
+			set
+			{
+				lock (ListLock)
+				{
+					_list.Clear();
+					_list = value;
+				}
+				NotifyPropertyChanged("RecentList");
+			}
+		}
+
+		public RecentPlayedListData()
+		{
+			_list = new List<PodcastEpisodeView>();
+		}
+
+		public void UpdateRecentList(Dictionary<string, PodcastEpisode> list)
+		{
+			try
+			{
+				lock (ListLock)
+				{
+					_list = new List<PodcastEpisodeView>();
+					foreach (var item in list)
+					{
+						_list.Add(new PodcastEpisodeView(item));
+					}
+				}
+				NotifyPropertyChanged("RecentList");
+			}
+			catch (Exception ex)
 			{
 				ErrorTracker.CurrentError = ex.Message;
 			}

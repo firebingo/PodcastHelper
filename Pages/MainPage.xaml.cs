@@ -27,6 +27,7 @@ namespace PodcastHelper.Pages
 	{
 		public Config config;
 		private RecentPodcastListData recentListData = null;
+		private RecentPlayedListData recentPlayedListData = null;
 		private ErrorData errorData = null;
 		private SearchPodcastData searchData = null;
 
@@ -37,7 +38,8 @@ namespace PodcastHelper.Pages
 
 			errorData = new ErrorData();
 			errorGrid.DataContext = errorData;
-			PodcastFunctions.UpdateLatestList += OnLatestListUpdate;
+			PodcastFunctions.UpdateLatestListEvent += OnLatestListUpdate;
+			PodcastFunctions.UpdateLatestPlayedListEvent += OnRecentPlayListUpdate;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
@@ -47,7 +49,9 @@ namespace PodcastHelper.Pages
 		public async Task initializePodcasts()
 		{
 			recentListData = new RecentPodcastListData();
-			recentPodcastList.DataContext = recentListData;
+			podcastListItems.DataContext = recentListData;
+			recentPlayedListData = new RecentPlayedListData();
+			podcastRecentPlayedItems.DataContext = recentPlayedListData;
 			searchData = new SearchPodcastData();
 			searchPodcastList.DataContext = searchData;
 
@@ -58,11 +62,17 @@ namespace PodcastHelper.Pages
 				await pod.Value.CheckForDownloadedEpisodes();
 			}
 			await PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
+			await PodcastFunctions.UpdateLatestPlayedList().ConfigureAwait(false);
 		}
 
 		private void OnLatestListUpdate()
 		{
 			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
+		}
+
+		private void OnRecentPlayListUpdate()
+		{
+			recentPlayedListData.UpdateRecentList(PodcastFunctions.LatestPlayedList);
 		}
 
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
