@@ -88,11 +88,14 @@ namespace PodcastHelper.Function
 
 			foreach(var podcast in config.EpisodeList.Episodes)
 			{
-				foreach(var episode in podcast.Value)
+				var pod = Config.Instance.ConfigObject.PodcastMap.Podcasts[podcast.Key];
+				var temp = new List<PodcastEpisodeView>();
+				foreach (var episode in podcast.Value)
 				{
 					var contains = false;
 					if (episode.Value.FileName.ContainsInvariant(searchString) || episode.Value.EpisodeNumber.ToString().ContainsInvariant(searchString) 
-						|| episode.Value.Title.ContainsInvariant(searchString) || episode.Value.Description.ContainsInvariant(searchString))
+						|| episode.Value.Title.ContainsInvariant(searchString) || episode.Value.Description.ContainsInvariant(searchString) 
+						|| pod.Names.Any(x => x.ContainsInvariant(searchString)))
 						contains = true;
 
 					foreach(var s in episode.Value.Keywords)
@@ -107,9 +110,10 @@ namespace PodcastHelper.Function
 					if (contains)
 					{
 						if (config.ConfigObject.PodcastMap.Podcasts.ContainsKey(episode.Value.PodcastShortCode))
-							result.Add(new PodcastEpisodeView(config.ConfigObject.PodcastMap.Podcasts[episode.Value.PodcastShortCode].PrimaryName, episode.Value));
+							temp.Add(new PodcastEpisodeView(config.ConfigObject.PodcastMap.Podcasts[episode.Value.PodcastShortCode].PrimaryName, episode.Value));
 					}
 				}
+				result.AddRange(temp.OrderByDescending(x => x.Episode.EpisodeNumber));
 			}
 
 			return result;

@@ -55,8 +55,8 @@
 											</TextBlock.Text>
 										</TextBlock>
 										<TextBlock Text="{Binding Path=Episode.Description, StringFormat=Description: {0}}" TextWrapping="Wrap" MaxHeight="30"></TextBlock>
-										<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>
-										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0}}"></TextBlock>
+										<!--<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>-->
+										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0:hh\\:mm\\:ss}}"></TextBlock>
 										<Grid HorizontalAlignment="Stretch">
 											<Grid.ColumnDefinitions>
 												<ColumnDefinition />

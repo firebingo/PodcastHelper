@@ -63,6 +63,7 @@ namespace PodcastHelper.Pages
 			}
 			await PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
 			await PodcastFunctions.UpdateLatestPlayedList().ConfigureAwait(false);
+			VlcApi.DoNothing();
 		}
 
 		private void OnLatestListUpdate()

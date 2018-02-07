@@ -37,6 +37,25 @@ namespace PodcastHelper.Helpers
 			return ret;
 		}
 
+		public static int GetEpisodeNumberFromFeed(SyndicationItem item)
+		{
+			var ret = -1;
+
+			if (!string.IsNullOrWhiteSpace(item.Id))
+				ret = ParseEpisodeNumber(item.Id);
+			if (ret == -1)
+				ret = ParseEpisodeNumber(item.Title.Text);
+			if (ret == -1)
+			{
+				Uri enclosure = null;
+				if (item.Links != null)
+					enclosure = item.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
+				ret = ParseEpisodeNumber(enclosure.Segments.Last());
+			}
+
+			return ret;
+		}
+
 		public static List<string> ReadKeywords(SyndicationElementExtension ele)
 		{
 			var ret = new List<string>();

@@ -30,6 +30,9 @@ namespace PodcastHelper.Function
 			_progressThread.Start();
 		}
 
+		//Just need something to activate the static reference and run the constructor.
+		public static void DoNothing() { }
+
 		public static async Task PlayFile(string path, int? seconds = null)
 		{
 			try
@@ -115,12 +118,11 @@ namespace PodcastHelper.Function
 						foreach (var podcast in Config.Instance.EpisodeList.Episodes)
 						{
 							ep = podcast.Value.Values.FirstOrDefault(x => x.FileName == status.FileInfo.FileName || x.Title == status.FileInfo.FileName);
+							if(ep != null)
+								break;
 						}
 						if (ep != null)
 						{
-							if (ep.Progress == null)
-								ep.Progress = new EpisodeProgress();
-
 							ep.Progress.Length = status.Length > 0 ? new TimeSpan(0, 0, status.Length) : ep.Progress.Length;
 							ep.Progress.Progress = status.Position > 0 ? status.Position : (status.Time / status.Length);
 							Config.Instance.SaveConfig();
@@ -130,9 +132,7 @@ namespace PodcastHelper.Function
 						_nextUpdate = DateTime.UtcNow + _playingNextTime;
 					}
 					else if(status.State == PlayingState.Stopped)
-					{
 						_nextUpdate = DateTime.UtcNow + _defaultNextTime;
-					}
 				}
 			}
 			catch(Exception ex)

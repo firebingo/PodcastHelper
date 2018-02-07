@@ -2,6 +2,7 @@
 using PodcastHelper.Models;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace PodcastHelper.Function
 {
@@ -15,7 +16,7 @@ namespace PodcastHelper.Function
 				if (_instance == null)
 				{
 					_instance = new Config();
-					_instance.loadConfig();
+					_instance.LoadConfig();
 				}
 				return _instance;
 			}
@@ -26,7 +27,7 @@ namespace PodcastHelper.Function
 		public ConfigModel ConfigObject;
 		public PodcastEpisodeList EpisodeList;
 
-		public void loadConfig()
+		public void LoadConfig()
 		{
 			try
 			{
@@ -82,6 +83,43 @@ namespace PodcastHelper.Function
 			{
 				ErrorTracker.CurrentError = ex.Message;
 			}
+		}
+	}
+
+	public static class WindowPlacementHandler
+	{
+		[DllImport("user32.dll")]
+		private static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
+
+		[DllImport("user32.dll")]
+		private static extern bool GetWindowPlacement(IntPtr hWnd, out WINDOWPLACEMENT lpwndpl);
+
+		private const int SW_SHOWNORMAL = 1;
+		private const int SW_SHOWMINIMIZED = 2;
+
+		public static void SetPlacement(IntPtr windowHandle)
+		{
+			WINDOWPLACEMENT placement;
+
+			try
+			{
+				placement = Config.Instance.ConfigObject.WindowPlacement;
+
+				placement.length = Marshal.SizeOf(typeof(WINDOWPLACEMENT));
+				placement.flags = 0;
+				placement.showCmd = (placement.showCmd == SW_SHOWMINIMIZED ? SW_SHOWNORMAL : placement.showCmd);
+				SetWindowPlacement(windowHandle, ref placement);
+			}
+			catch (InvalidOperationException) { }
+		}
+
+		public static void GetPlacement(IntPtr windowHandle)
+		{
+			WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+			GetWindowPlacement(windowHandle, out placement);
+
+			Config.Instance.ConfigObject.WindowPlacement = placement;
+			Config.Instance.SaveConfig();
 		}
 	}
 }

@@ -87,37 +87,15 @@ namespace PodcastHelper.Models
 				CheckListLoaded();
 
 				var newestEpisode = -1;
-				var highestCurrent = -1;
 
-				var pathToGet = Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath);
-				if (!Directory.Exists(pathToGet))
-					Directory.CreateDirectory(pathToGet);
-				var files = GetRootAndOneSubFiles(pathToGet);
-
-				foreach (var f in files)
+				foreach (var ep in _episodes)
 				{
-					var num = HelperMethods.ParseEpisodeNumber(Path.GetFileNameWithoutExtension(f));
-					if (num > highestCurrent)
-						highestCurrent = num;
-					//If we have the file here mark it as downloaded since we are looping over the files anyways.
-					if (_episodes.ContainsKey(num))
-						_episodes[num].IsDownloaded = true;
+					if (ep.Value.EpisodeNumber > newestEpisode)
+						newestEpisode = ep.Value.EpisodeNumber;
 				}
 
-				await GetFeed();
-
-				foreach (var f in _feedCache.Items)
-				{
-					var num = HelperMethods.ParseEpisodeNumber(f.Title.Text);
-					if (num > newestEpisode && num <= MaxEpisodeCount)
-						newestEpisode = num;
-				}
-
-				if (newestEpisode > highestCurrent)
-				{
+				if (newestEpisode > LatestEpisode)
 					LatestEpisode = newestEpisode;
-					//_hasLatest = false;
-				}
 
 				Config.Instance.SaveConfig();
 
@@ -140,6 +118,7 @@ namespace PodcastHelper.Models
 				else
 					ep.Value.IsDownloaded = false;
 			}
+			Config.Instance.SaveConfig();
 			return Task.FromResult(0);
 		}
 
@@ -153,44 +132,42 @@ namespace PodcastHelper.Models
 			var addedNew = false;
 			foreach (var f in _feedCache.Items)
 			{
-				var num = HelperMethods.ParseEpisodeNumber(f.Title.Text);
-				Uri enclosure = null;
-				if (f.Links != null)
-					enclosure = f.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
-
-				List<string> keywords = null;
-				TimeSpan duration = new TimeSpan();
-				foreach(var ext in f.ElementExtensions)
+				var num = HelperMethods.GetEpisodeNumberFromFeed(f);
+				if (!_episodes.ContainsKey(num) && num != -1 && num >= MinEpisodeCount && num <= MaxEpisodeCount)
 				{
-					switch(ext.OuterName.ToLowerInvariant())
-					{
-						case "keywords":
-							keywords = HelperMethods.ReadKeywords(ext);
-							break;
-						case "duration":
-							duration = HelperMethods.ReadDuration(ext);
-							break;
-					}
-				}
+					Uri enclosure = null;
+					if (f.Links != null)
+						enclosure = f.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
 
-				if (num != -1 && num >= MinEpisodeCount)
-				{
-					if (!_episodes.ContainsKey(num))
+					List<string> keywords = null;
+					TimeSpan duration = new TimeSpan();
+					foreach (var ext in f.ElementExtensions)
 					{
-						var episode = new PodcastEpisode() {
-							PodcastShortCode = ShortCode,
-							EpisodeNumber = num,
-							Title = f.Title?.Text,
-							Description = f.Summary?.Text,
-							PublishDateUtc = f.PublishDate.UtcDateTime,
-							Keywords = keywords.ToArray()
-						};
-						if (enclosure != null)
-							episode.FileUri = enclosure;
-						episode.Progress.Length = duration;
-						_episodes.Add(num, episode);
-						addedNew = true;
+						switch (ext.OuterName.ToLowerInvariant())
+						{
+							case "keywords":
+								keywords = HelperMethods.ReadKeywords(ext);
+								break;
+							case "duration":
+								duration = HelperMethods.ReadDuration(ext);
+								break;
+						}
 					}
+
+					var episode = new PodcastEpisode()
+					{
+						PodcastShortCode = ShortCode,
+						EpisodeNumber = num,
+						Title = f.Title?.Text,
+						Description = f.Summary?.Text,
+						PublishDateUtc = f.PublishDate.UtcDateTime,
+						Keywords = keywords.ToArray()
+					};
+					if (enclosure != null)
+						episode.FileUri = enclosure;
+					episode.Progress.Length = duration;
+					_episodes.Add(num, episode);
+					addedNew = true;
 				}
 			}
 
@@ -201,7 +178,7 @@ namespace PodcastHelper.Models
 		public Task<bool> DownloadEpisode(int episode)
 		{
 			var info = new FileDownloadInfo();
-			if(_episodes.ContainsKey(episode))
+			if (_episodes.ContainsKey(episode))
 			{
 				var episodeToUse = _episodes[episode];
 				episodeToUse.IsDownloaded = false;
@@ -222,6 +199,7 @@ namespace PodcastHelper.Models
 				return;
 			var episodeToUse = _episodes[ep];
 			episodeToUse.IsDownloaded = res;
+			Config.Instance.SaveConfig();
 			FileDownloader.OnDownloadFinishedEvent -= OnFinishDownloading;
 			PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
 		}
