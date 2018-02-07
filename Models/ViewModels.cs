@@ -83,7 +83,7 @@ namespace PodcastHelper.Models
 				}
 				NotifyPropertyChanged("RecentList");
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				ErrorTracker.CurrentError = ex.Message;
 			}
@@ -241,6 +241,74 @@ namespace PodcastHelper.Models
 		{
 			_searchString = string.Empty;
 			_results = new List<PodcastEpisodeView>();
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+
+	public class TimeSliderData : INotifyPropertyChanged
+	{
+		private int _width;
+		public int Width
+		{
+			get
+			{
+				return _width;
+			}
+			set
+			{
+				_width = value;
+				NotifyPropertyChanged("Width");
+			}
+		}
+
+		private double _sliderPos;
+		public double SliderPosition
+		{
+			get
+			{
+				return _sliderPos;
+			}
+			set
+			{
+				_sliderPos = value;
+				NotifyPropertyChanged("SliderPosition");
+				NotifyPropertyChanged("CurrentValue");
+			}
+		}
+
+		private TimeSpan _maxValue;
+		public TimeSpan MaxValue
+		{
+			get
+			{
+				return _maxValue;
+			}
+			set
+			{
+				_maxValue = value;
+				NotifyPropertyChanged("MaxValue");
+				NotifyPropertyChanged("CurrentValue");
+			}
+		}
+
+		public TimeSpan CurrentValue
+		{
+			get
+			{
+				return new TimeSpan(0, 0, (int)(_maxValue.TotalSeconds * _sliderPos));
+			}
+		}
+
+		public TimeSliderData()
+		{
+			_width = 0;
+			_sliderPos = 0.0;
+			_maxValue = new TimeSpan(1,0,0);
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

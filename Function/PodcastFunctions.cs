@@ -16,6 +16,8 @@ namespace PodcastHelper.Function
 		private static Dictionary<string, PodcastEpisode> _latestPlayedCache;
 		public static event OnUpdate UpdateLatestPlayedListEvent;
 
+		public static bool IsPlaying = false;
+
 		static PodcastFunctions()
 		{
 			_latestPodcastCache = new Dictionary<string, PodcastEpisode>();

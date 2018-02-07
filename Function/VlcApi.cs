@@ -92,9 +92,11 @@ namespace PodcastHelper.Function
 
 		private static async Task<string> SendRequest(Uri uri)
 		{
-			var request = new HttpRequestMessage();
-			request.Method = HttpMethod.Post;
-			request.RequestUri = uri;
+			var request = new HttpRequestMessage()
+			{
+				Method = HttpMethod.Post,
+				RequestUri = uri
+			};
 			var authBase = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{Config.Instance.ConfigObject.VlcUsername}:{Config.Instance.ConfigObject.VlcPassword}"));
 			request.Headers.Add("Authorization", $"Basic {authBase}");
 
@@ -118,7 +120,7 @@ namespace PodcastHelper.Function
 						foreach (var podcast in Config.Instance.EpisodeList.Episodes)
 						{
 							ep = podcast.Value.Values.FirstOrDefault(x => x.FileName == status.FileInfo.FileName || x.Title == status.FileInfo.FileName);
-							if(ep != null)
+							if (ep != null)
 								break;
 						}
 						if (ep != null)
@@ -129,10 +131,14 @@ namespace PodcastHelper.Function
 						}
 						//var ep = Config.Instance.EpisodeList.Episodes.Where(x => x.Value.Values.Where(y => y.FileName == status.FileInfo.FileName).First() != null);
 
+						PodcastFunctions.IsPlaying = true;
 						_nextUpdate = DateTime.UtcNow + _playingNextTime;
 					}
-					else if(status.State == PlayingState.Stopped)
+					else if (status.State == PlayingState.Stopped)
+					{
 						_nextUpdate = DateTime.UtcNow + _defaultNextTime;
+						PodcastFunctions.IsPlaying = false;
+					}
 				}
 			}
 			catch(Exception ex)

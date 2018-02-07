@@ -1,10 +1,9 @@
 ﻿using PodcastHelper.Function;
 using PodcastHelper.Models;
 using PodcastHelper.Resources;
+using PodcastHelper.Windows;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +29,7 @@ namespace PodcastHelper.Pages
 		private RecentPlayedListData recentPlayedListData = null;
 		private ErrorData errorData = null;
 		private SearchPodcastData searchData = null;
+		private TimeSliderData sliderData = null;
 
 		public MainPage()
 		{
@@ -38,15 +38,18 @@ namespace PodcastHelper.Pages
 
 			errorData = new ErrorData();
 			errorGrid.DataContext = errorData;
+			sliderData = new TimeSliderData();
+			timeSlider.DataContext = sliderData;
 			PodcastFunctions.UpdateLatestListEvent += OnLatestListUpdate;
 			PodcastFunctions.UpdateLatestPlayedListEvent += OnRecentPlayListUpdate;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
-			initializePodcasts().ConfigureAwait(false);
+			MainWindow.OnMainWindowSizeChanged += OnMainWindowSizeChanged;
+			InitializePodcasts().ConfigureAwait(false);
 		}
 
-		public async Task initializePodcasts()
+		public async Task InitializePodcasts()
 		{
 			recentListData = new RecentPodcastListData();
 			podcastListItems.DataContext = recentListData;
@@ -66,6 +69,11 @@ namespace PodcastHelper.Pages
 			VlcApi.DoNothing();
 		}
 
+		private void OnMainWindowSizeChanged(double width, double height)
+		{
+			sliderData.Width = Convert.ToInt32(width - 40);
+		}
+
 		private void OnLatestListUpdate()
 		{
 			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
@@ -78,30 +86,20 @@ namespace PodcastHelper.Pages
 
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
-			var button = sender as Button;
-			if (button?.DataContext is PodcastEpisodeView)
+			if ((sender as Button)?.DataContext is PodcastEpisodeView kvp)
 			{
-				var kvp = ((PodcastEpisodeView)button.DataContext);
 				var podcast = config.ConfigObject.PodcastMap.Podcasts.FirstOrDefault(x => x.Value.PrimaryName == kvp.PrimaryName).Value;
 				var ep = kvp.Episode.EpisodeNumber;
 				if (podcast == null)
 					return;
 				PodcastFunctions.DownloadEpisode(ep, podcast).ConfigureAwait(false);
 			}
-			else
-				return;
 		}
 
 		private void PlayRecentClicked(object sender, RoutedEventArgs e)
 		{
-			var button = sender as Button;
-			if (button?.DataContext is PodcastEpisodeView)
-			{
-				var kvp = ((PodcastEpisodeView)button.DataContext);
+			if ((sender as Button)?.DataContext is PodcastEpisodeView kvp)
 				PodcastFunctions.PlayFile(kvp, false).ConfigureAwait(false);
-			}
-			else
-				return;
 		}
 
 		private void SearchPodcastsClicked(object sender, RoutedEventArgs e)
@@ -123,37 +121,23 @@ namespace PodcastHelper.Pages
 
 		public void SelectEpisodeClicked(object sender, RoutedEventArgs e)
 		{
-			var grid = sender as Grid;
-			if(grid != null)
-			{
-				var episode = grid.DataContext as PodcastEpisodeView;
-				if (episode != null)
-					searchData.CurrentEpisode = episode;
-			}
+			if ((sender as Grid)?.DataContext is PodcastEpisodeView episode)
+				searchData.CurrentEpisode = episode;
 		}
 
 		private void SummaryPlayClicked(object sender, RoutedEventArgs e)
 		{
-			var button = sender as Button;
-			if (button?.DataContext is PodcastEpisodeView)
-			{
-				var kvp = ((PodcastEpisodeView)button.DataContext);
+			if((sender as Button)?.DataContext is PodcastEpisodeView kvp)
 				PodcastFunctions.PlayFile(kvp, false).ConfigureAwait(false);
-			}
-			else
-				return;
 		}
 
 		private void SummaryPlayStartClicked(object sender, RoutedEventArgs e)
 		{
-			var button = sender as Button;
-			if (button?.DataContext is PodcastEpisodeView)
+			if (sender is Button button)
 			{
-				var kvp = ((PodcastEpisodeView)button.DataContext);
-				PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
+				if (button?.DataContext is PodcastEpisodeView kvp)
+					PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
 			}
-			else
-				return;
 		}
 	}
 }

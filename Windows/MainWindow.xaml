@@ -8,9 +8,10 @@
         Title="Podcast Helper"
 	    Height="410"
 	    Width="1040"
-		MinHeight="200"
-		MinWidth="640"
-		Closing="WindowClosing">
+		MinHeight="410"
+		MinWidth="660"
+		Closing="WindowClosing"
+		SizeChanged="WindowSizeChanged">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

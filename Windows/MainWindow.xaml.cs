@@ -23,6 +23,9 @@ namespace PodcastHelper.Windows
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		public delegate void onWindowChanged(double width, double height);
+		public static event onWindowChanged OnMainWindowSizeChanged;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -32,6 +35,7 @@ namespace PodcastHelper.Windows
 		{
 			base.OnSourceInitialized(e);
 			WindowPlacementHandler.SetPlacement(new WindowInteropHelper(this).Handle);
+			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
 		}
 
 		private void WindowClosing(object sender, CancelEventArgs e)
@@ -39,6 +43,11 @@ namespace PodcastHelper.Windows
 			FileDownloader.Kill();
 			VlcApi.Kill();
 			WindowPlacementHandler.GetPlacement(new WindowInteropHelper(this).Handle);
+		}
+
+		private void WindowSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
 		}
 	}
 }

@@ -67,15 +67,19 @@ namespace PodcastHelper.Function
 					Directory.CreateDirectory(directoryName);
 				using (StreamWriter writer = new StreamWriter(File.Create(ConfigPath)))
 				{
-					JsonSerializer serializer = new JsonSerializer();
-					serializer.Formatting = Formatting.Indented;
+					JsonSerializer serializer = new JsonSerializer()
+					{
+						Formatting = Formatting.Indented
+					};
 					serializer.Serialize(writer, ConfigObject);
 				}
 
 				using (StreamWriter writer = new StreamWriter(File.Create(EpisodeListPath)))
 				{
-					JsonSerializer serializer = new JsonSerializer();
-					serializer.Formatting = Formatting.Indented;
+					JsonSerializer serializer = new JsonSerializer()
+					{
+						Formatting = Formatting.Indented
+					};
 					serializer.Serialize(writer, EpisodeList);
 				}
 			}
