@@ -3,6 +3,7 @@ using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PodcastHelper.Function
@@ -16,12 +17,20 @@ namespace PodcastHelper.Function
 		private static Dictionary<string, PodcastEpisode> _latestPlayedCache;
 		public static event OnUpdate UpdateLatestPlayedListEvent;
 
-		public static bool IsPlaying = false;
+		public static PlayingState PlayingState = PlayingState.Stopped;
+		private static PodcastEpisode _playingEpisode = null;
+		public delegate void playingEpisodeChanged(PodcastEpisode episode);
+		public static event playingEpisodeChanged PlayingEpisodeChangedEvent;
+		private static Thread _playingThread;
+		private static bool _runThread;
 
 		static PodcastFunctions()
 		{
 			_latestPodcastCache = new Dictionary<string, PodcastEpisode>();
 			_latestPlayedCache = new Dictionary<string, PodcastEpisode>();
+			_runThread = true;
+			_playingThread = new Thread(RunPlayingThread);
+			_playingThread.Start();
 		}
 
 		public static Dictionary<string, PodcastEpisode> LatestPodcastList
@@ -37,6 +46,19 @@ namespace PodcastHelper.Function
 			get
 			{
 				return _latestPlayedCache;
+			}
+		}
+
+		public static PodcastEpisode PlayingEpisode
+		{
+			get
+			{
+				return _playingEpisode;
+			}
+			set
+			{
+				_playingEpisode = value;
+				PlayingEpisodeChangedEvent?.Invoke(_playingEpisode);
 			}
 		}
 
@@ -139,7 +161,39 @@ namespace PodcastHelper.Function
 			await VlcApi.PlayFile(path, seconds);
 
 			podcast.LastPlayed = ep.Episode.EpisodeNumber;
-			UpdateLatestPlayedList();
+			await UpdateLatestPlayedList().ConfigureAwait(false);
+		}
+
+		public static async Task SeekFile(double value)
+		{
+			if (PlayingState == PlayingState.Stopped || PlayingEpisode == null)
+				return;
+			var seconds = PlayingEpisode.Progress.Length.TotalSeconds * (value / 100);
+			await VlcApi.SeekFile(Convert.ToInt32(seconds));
+			PlayingEpisode.Progress.Progress = value / 100;
+			Config.Instance.SaveConfig();
+		}
+
+		private static void RunPlayingThread()
+		{
+			do
+			{
+				Thread.Sleep(1000);
+				if (PlayingState == PlayingState.Playing)
+				{
+					double addTime = 1 / PlayingEpisode.Progress.Length.TotalSeconds;
+					PlayingEpisode.Progress.Progress += addTime;
+					PlayingEpisodeChangedEvent?.Invoke(_playingEpisode);
+				}
+			} while (_runThread);
+
+			return;
+		}
+
+		public static void Kill()
+		{
+			_runThread = false;
+			_playingThread.Abort();
 		}
 	}
 }

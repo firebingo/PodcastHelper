@@ -49,6 +49,18 @@ namespace PodcastHelper.Function
 			}
 		}
 
+		public static async Task SeekFile(int seconds)
+		{
+			try
+			{
+				await SeekTo(seconds);
+			}
+			catch (Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+			}
+		}
+
 		private static async Task PlayFile(string path)
 		{
 			try
@@ -128,16 +140,17 @@ namespace PodcastHelper.Function
 							ep.Progress.Length = status.Length > 0 ? new TimeSpan(0, 0, status.Length) : ep.Progress.Length;
 							ep.Progress.Progress = status.Position > 0 ? status.Position : (status.Time / status.Length);
 							Config.Instance.SaveConfig();
+							PodcastFunctions.PlayingState = status.State;
+							PodcastFunctions.PlayingEpisode = ep;
 						}
-						//var ep = Config.Instance.EpisodeList.Episodes.Where(x => x.Value.Values.Where(y => y.FileName == status.FileInfo.FileName).First() != null);
 
-						PodcastFunctions.IsPlaying = true;
 						_nextUpdate = DateTime.UtcNow + _playingNextTime;
 					}
 					else if (status.State == PlayingState.Stopped)
 					{
+						PodcastFunctions.PlayingState = status.State;
+						PodcastFunctions.PlayingEpisode = null;
 						_nextUpdate = DateTime.UtcNow + _defaultNextTime;
-						PodcastFunctions.IsPlaying = false;
 					}
 				}
 			}

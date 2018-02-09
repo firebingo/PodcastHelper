@@ -77,12 +77,12 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		public async Task<int> CheckForNew()
+		public Task<int> CheckForNew()
 		{
 			try
 			{
 				if (string.IsNullOrWhiteSpace(RssPath))
-					return LatestEpisode;
+					return Task.FromResult(LatestEpisode);
 
 				CheckListLoaded();
 
@@ -99,12 +99,12 @@ namespace PodcastHelper.Models
 
 				Config.Instance.SaveConfig();
 
-				return LatestEpisode;
+				return Task.FromResult(LatestEpisode);
 			}
 			catch (Exception ex)
 			{
 				ErrorTracker.CurrentError = ex.Message;
-				return -1;
+				return Task.FromResult(-1);
 			}
 		}
 

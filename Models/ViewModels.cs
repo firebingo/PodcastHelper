@@ -266,6 +266,7 @@ namespace PodcastHelper.Models
 			}
 		}
 
+		//Note that this should be between 0-100
 		private double _sliderPos;
 		public double SliderPosition
 		{
@@ -300,7 +301,7 @@ namespace PodcastHelper.Models
 		{
 			get
 			{
-				return new TimeSpan(0, 0, (int)(_maxValue.TotalSeconds * _sliderPos));
+				return new TimeSpan(0, 0, (int)(_maxValue.TotalSeconds * (_sliderPos / 100)));
 			}
 		}
 
@@ -308,7 +309,23 @@ namespace PodcastHelper.Models
 		{
 			_width = 0;
 			_sliderPos = 0.0;
-			_maxValue = new TimeSpan(1,0,0);
+			_maxValue = new TimeSpan(0,0,0);
+			PodcastFunctions.PlayingEpisodeChangedEvent += PlayingEpisodeChanged;
+		}
+
+		private void PlayingEpisodeChanged(PodcastEpisode episode)
+		{
+			if (episode != null)
+			{
+				SliderPosition = episode.Progress.Progress * 100;
+				if(_maxValue.Ticks != episode.Progress.Length.Ticks)
+					MaxValue = episode.Progress.Length;
+			}
+			else
+			{
+				SliderPosition = 0.0;
+				MaxValue = new TimeSpan(0, 0, 0);
+			}
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

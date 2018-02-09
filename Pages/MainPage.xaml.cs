@@ -109,6 +109,17 @@ namespace PodcastHelper.Pages
 			searchData.SearchResults = res;
 		}
 
+
+		private void SearchPodcastKeyUp(object sender, KeyEventArgs e)
+		{
+			if(e.Key == Key.Enter && sender is TextBox textBox)
+			{
+				var res = PodcastFunctions.SearchPodcasts(textBox.Text);
+				searchData.SearchResults.Clear();
+				searchData.SearchResults = res;
+			}
+		}
+
 		private void CloseSearchSummary(object sender, RoutedEventArgs e)
 		{
 			searchData.CurrentEpisode = null;
@@ -133,11 +144,14 @@ namespace PodcastHelper.Pages
 
 		private void SummaryPlayStartClicked(object sender, RoutedEventArgs e)
 		{
-			if (sender is Button button)
-			{
-				if (button?.DataContext is PodcastEpisodeView kvp)
-					PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
-			}
+			if ((sender as Button)?.DataContext is PodcastEpisodeView kvp)
+				PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
+		}
+
+		private void TimeSliderMouseUp(object sender, MouseButtonEventArgs e)
+		{
+			if(sender is Slider slider)
+				PodcastFunctions.SeekFile(slider.Value).ConfigureAwait(false);
 		}
 	}
 }

@@ -19,8 +19,8 @@ namespace PodcastHelper.Function
 		private static HttpClient _webClient;
 		public delegate void onDownloadFinished(bool res, int ep, string shortCode);
 		public static event onDownloadFinished OnDownloadFinishedEvent;
-		public delegate void onDownloadingUpdate(string shortCode, int ep, float progress);
-		public static event onDownloadingUpdate OnDownloadUpdateEvent;
+		//public delegate void onDownloadingUpdate(string shortCode, int ep, float progress);
+		//public static event onDownloadingUpdate OnDownloadUpdateEvent;
 
 		static FileDownloader()
 		{

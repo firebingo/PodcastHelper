@@ -37,7 +37,7 @@
 					<Grid x:Name="searchPodcastList" Margin="5">
 						<StackPanel>
 							<WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}"></TextBox>
+								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}" KeyUp="SearchPodcastKeyUp"></TextBox>
 								<Button Click="SearchPodcastsClicked">Search</Button>
 							</WrapPanel>
 							<ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding Path=MaxHeight}" MinHeight="125">
@@ -56,6 +56,7 @@
 										</TextBlock>
 										<TextBlock Text="{Binding Path=Episode.Description, StringFormat=Description: {0}}" TextWrapping="Wrap" MaxHeight="30"></TextBlock>
 										<!--<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>-->
+										<TextBlock Text="{Binding Path=Episode.Progress.Length, StringFormat=Length: {0:hh\\:mm\\:ss}}"></TextBlock>
 										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0:hh\\:mm\\:ss}}"></TextBlock>
 										<Grid HorizontalAlignment="Stretch">
 											<Grid.ColumnDefinitions>
@@ -85,7 +86,7 @@
 					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 				<TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
-				<Slider Maximum="1" Value="{Binding Path=SliderPosition}" Grid.Column="1"/>
+				<Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
 				<TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
 			</Grid>
 		</StackPanel>

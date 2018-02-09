@@ -42,6 +42,7 @@ namespace PodcastHelper.Windows
 		{
 			FileDownloader.Kill();
 			VlcApi.Kill();
+			PodcastFunctions.Kill();
 			WindowPlacementHandler.GetPlacement(new WindowInteropHelper(this).Handle);
 		}
 
