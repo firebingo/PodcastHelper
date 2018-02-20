@@ -30,6 +30,7 @@ namespace PodcastHelper.Function
 			_latestPlayedCache = new Dictionary<string, PodcastEpisode>();
 			_runThread = true;
 			_playingThread = new Thread(RunPlayingThread);
+			_playingThread.Name = "FunctionsPlaying";
 			_playingThread.Start();
 		}
 
@@ -172,6 +173,21 @@ namespace PodcastHelper.Function
 			await VlcApi.SeekFile(Convert.ToInt32(seconds));
 			PlayingEpisode.Progress.Progress = value / 100;
 			Config.Instance.SaveConfig();
+		}
+
+		public static async Task PauseCommand()
+		{
+			await VlcApi.PauseToggle();
+			if (PlayingState == PlayingState.Paused)
+				PlayingState = PlayingState.Playing;
+			else if (PlayingState == PlayingState.Playing)
+				PlayingState = PlayingState.Paused;
+		}
+
+		public static async Task StopCommand()
+		{
+			await VlcApi.StopFile();
+			PlayingState = PlayingState.Stopped;
 		}
 
 		private static void RunPlayingThread()

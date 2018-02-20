@@ -32,6 +32,7 @@ namespace PodcastHelper.Function
 			_downloadingStream = null;
 			_runThread = true;
 			_doThread = new Thread(RunThread);
+			_doThread.Name = "FileDownloader";
 			_doThread.Start();
 		}
 

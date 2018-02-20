@@ -75,6 +75,12 @@
 						</StackPanel>
 					</Grid>
 				</Border>
+				<Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Name="playerControls">
+					<WrapPanel>
+						<Button FontSize="16" Width="48" FontWeight="Bold" Margin="1" Click="PlayClicked">▶/❚❚</Button>
+						<Button FontSize="16" Width="24" FontWeight="Bold" Margin="1" Click="StopClicked">■</Button>
+					</WrapPanel>
+				</Grid>
 			</Grid>
 			<Grid x:Name="errorGrid" HorizontalAlignment="Center">
 				<Label HorizontalAlignment="Center" FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>

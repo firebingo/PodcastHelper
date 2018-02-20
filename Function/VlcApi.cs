@@ -27,6 +27,7 @@ namespace PodcastHelper.Function
 			_webClient = new HttpClient();
 			_runThread = true;
 			_progressThread = new Thread(RunStatusThread);
+			_progressThread.Name = "ApiStatus";
 			_progressThread.Start();
 		}
 
@@ -61,6 +62,30 @@ namespace PodcastHelper.Function
 			}
 		}
 
+		public static async Task PauseToggle()
+		{
+			try
+			{
+				await Pause();
+			}
+			catch (Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+			}
+		}
+
+		public static async Task StopFile()
+		{
+			try
+			{
+				await Stop();
+			}
+			catch (Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+			}
+		}
+
 		private static async Task PlayFile(string path)
 		{
 			try
@@ -68,6 +93,16 @@ namespace PodcastHelper.Function
 				if (Uri.TryCreate(new Uri(Config.Instance.ConfigObject.VlcRootUrl), $"/requests/status.xml?command=in_play&input={WebUtility.UrlEncode(path)}", out var uri))
 					await SendRequest(uri);
 				_nextUpdate = (DateTime.UtcNow + new TimeSpan(0, 0, 5));
+			}
+			catch { throw; }
+		}
+
+		private static async Task Pause()
+		{
+			try
+			{
+				if (Uri.TryCreate(new Uri(Config.Instance.ConfigObject.VlcRootUrl), "/requests/status.xml?command=pl_pause", out var uri))
+					await SendRequest(uri);
 			}
 			catch { throw; }
 		}

@@ -109,7 +109,6 @@ namespace PodcastHelper.Pages
 			searchData.SearchResults = res;
 		}
 
-
 		private void SearchPodcastKeyUp(object sender, KeyEventArgs e)
 		{
 			if(e.Key == Key.Enter && sender is TextBox textBox)
@@ -152,6 +151,16 @@ namespace PodcastHelper.Pages
 		{
 			if(sender is Slider slider)
 				PodcastFunctions.SeekFile(slider.Value).ConfigureAwait(false);
+		}
+
+		private void PlayClicked(object sender, RoutedEventArgs e)
+		{
+			PodcastFunctions.PauseCommand().ConfigureAwait(false);
+		}
+
+		private void StopClicked(object sender, RoutedEventArgs e)
+		{
+			PodcastFunctions.StopCommand().ConfigureAwait(false);
 		}
 	}
 }
