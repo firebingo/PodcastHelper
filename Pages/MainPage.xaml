@@ -19,7 +19,7 @@
 	<Grid Style="{StaticResource baseGridStyle}" >
 		<StackPanel>
 			<Grid x:Name="podcastInfo" VerticalAlignment="Center">
-				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
+				<Border BorderThickness="1" Margin="15" Height="300" Width="325" HorizontalAlignment="Left" VerticalAlignment="Top">
 					<Grid x:Name="recentPodcastList" Margin="5">
 						<StackPanel>
 							<TextBlock Height="20" Text="New Podcasts:"></TextBlock>
@@ -33,7 +33,7 @@
 						</StackPanel>
 					</Grid>
 				</Border>
-				<Border BorderThickness="1" Margin="15" Height="300" Width="300" HorizontalAlignment="Right" VerticalAlignment="Top">
+				<Border BorderThickness="1" Margin="15" Height="300" Width="325" HorizontalAlignment="Right" VerticalAlignment="Top">
 					<Grid x:Name="searchPodcastList" Margin="5">
 						<StackPanel>
 							<WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
@@ -75,6 +75,9 @@
 						</StackPanel>
 					</Grid>
 				</Border>
+				<Grid x:Name="errorGrid" HorizontalAlignment="Center">
+					<Label HorizontalAlignment="Center" FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
+				</Grid>
 				<Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Name="playerControls">
 					<WrapPanel>
 						<Button FontSize="16" Width="48" FontWeight="Bold" Margin="1" Click="PlayClicked">▶/❚❚</Button>
@@ -82,19 +85,16 @@
 					</WrapPanel>
 				</Grid>
 			</Grid>
-			<Grid x:Name="errorGrid" HorizontalAlignment="Center">
-				<Label HorizontalAlignment="Center" FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
-			</Grid>
-			<Grid x:Name="timeSlider" HorizontalAlignment="Center" Width="{Binding Path=Width}">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
-				<TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
-				<Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
-				<TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
-			</Grid>
 		</StackPanel>
+		<Grid x:Name="timeSlider" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="{Binding Path=Width}" Margin="0,0,0,10">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
+			<Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
+			<TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
+		</Grid>
 	</Grid>
 </Page>

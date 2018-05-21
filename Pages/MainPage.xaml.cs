@@ -36,8 +36,15 @@ namespace PodcastHelper.Pages
 			InitializeComponent();
 			config = Config.Instance;
 
+			recentListData = new RecentPodcastListData();
+			podcastListItems.DataContext = recentListData;
+			recentPlayedListData = new RecentPlayedListData();
+			podcastRecentPlayedItems.DataContext = recentPlayedListData;
+			searchData = new SearchPodcastData();
+			searchPodcastList.DataContext = searchData;
 			errorData = new ErrorData();
 			errorGrid.DataContext = errorData;
+			errorData.Error = "Loading...";
 			sliderData = new TimeSliderData();
 			timeSlider.DataContext = sliderData;
 			PodcastFunctions.UpdateLatestListEvent += OnLatestListUpdate;
@@ -46,18 +53,11 @@ namespace PodcastHelper.Pages
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
 			MainWindow.OnMainWindowSizeChanged += OnMainWindowSizeChanged;
-			InitializePodcasts().ConfigureAwait(false);
+			Task.Run(() => InitializePodcasts());
 		}
 
 		public async Task InitializePodcasts()
 		{
-			recentListData = new RecentPodcastListData();
-			podcastListItems.DataContext = recentListData;
-			recentPlayedListData = new RecentPlayedListData();
-			podcastRecentPlayedItems.DataContext = recentPlayedListData;
-			searchData = new SearchPodcastData();
-			searchPodcastList.DataContext = searchData;
-
 			foreach (var pod in config.ConfigObject.PodcastMap.Podcasts)
 			{
 				await pod.Value.CheckForNew();
@@ -66,6 +66,7 @@ namespace PodcastHelper.Pages
 			}
 			await PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
 			await PodcastFunctions.UpdateLatestPlayedList().ConfigureAwait(false);
+			errorData.Error = "";
 			VlcApi.DoNothing();
 		}
 

@@ -14,6 +14,8 @@ namespace PodcastHelper.Function
 		private static Queue<FileDownloadInfo> _queue;
 		private static FileDownloadInfo _downloadingFile;
 		private static Stream _downloadingStream;
+		private static FileStream _fileStream;
+		private static CancellationTokenSource cancelSource = new CancellationTokenSource();
 		private static Thread _doThread;
 		private static bool _runThread = true;
 		private static HttpClient _webClient;
@@ -70,7 +72,7 @@ namespace PodcastHelper.Function
 						}
 					}
 				}
-				else if(_downloadingFile != null && _downloadingStream != null)
+				else if (_downloadingFile != null && _downloadingStream != null)
 				{
 					try
 					{
@@ -107,14 +109,21 @@ namespace PodcastHelper.Function
 				else
 					OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
+				cancelSource.Cancel();
 				OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
 				ErrorTracker.CurrentError = ex.Message;
 			}
 			finally
 			{
-				_downloadingStream = null;
+				//These should already be disposed.
+				if (_fileStream != null)
+					_fileStream = null;
+				if (_downloadingStream != null)
+					_downloadingStream = null;
+				cancelSource.Dispose();
+				cancelSource = new CancellationTokenSource();
 				_downloadingFile = null;
 			}
 		}
@@ -125,11 +134,9 @@ namespace PodcastHelper.Function
 			{
 				using (_downloadingStream = await _webClient.GetStreamAsync(_downloadingFile.FileUri))
 				{
-					FileStream fileStream = null;
-
-					using (fileStream = new FileStream(_downloadingFile.FilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+					using (_fileStream = new FileStream(_downloadingFile.FilePath, FileMode.Create, FileAccess.Write, FileShare.None))
 					{
-						await _downloadingStream.CopyToAsync(fileStream);
+						await _downloadingStream.CopyToAsync(_fileStream, 81920, cancelSource.Token);
 					}
 				}
 			}
