@@ -62,6 +62,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\MomentsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\ItemsControlTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -94,6 +98,9 @@
     <Compile Include="Models\Vlc.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MomentsPage.xaml.cs">
+      <DependentUpon>MomentsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\ItemsControlTemplates.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,9 +26,11 @@ namespace PodcastHelper.Windows
 	{
 		public delegate void onWindowChanged(double width, double height);
 		public static event onWindowChanged OnMainWindowSizeChanged;
+		private VisiblePage visiblePage;
 
 		public MainWindow()
 		{
+			visiblePage = VisiblePage.Control;
 			InitializeComponent();
 		}
 
@@ -36,6 +39,8 @@ namespace PodcastHelper.Windows
 			base.OnSourceInitialized(e);
 			WindowPlacementHandler.SetPlacement(new WindowInteropHelper(this).Handle);
 			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
+
+			mainPage.Visibility = Visibility.Visible;
 		}
 
 		private void WindowClosing(object sender, CancelEventArgs e)
@@ -50,5 +55,10 @@ namespace PodcastHelper.Windows
 		{
 			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
 		}
+	}
+
+	public enum VisiblePage
+	{
+		Control = 0
 	}
 }

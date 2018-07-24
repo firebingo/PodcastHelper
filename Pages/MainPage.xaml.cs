@@ -30,6 +30,7 @@ namespace PodcastHelper.Pages
 		private ErrorData errorData = null;
 		private SearchPodcastData searchData = null;
 		private TimeSliderData sliderData = null;
+		private bool isLoading = false;
 
 		public MainPage()
 		{
@@ -58,6 +59,7 @@ namespace PodcastHelper.Pages
 
 		public async Task InitializePodcasts()
 		{
+			isLoading = true;
 			foreach (var pod in config.ConfigObject.PodcastMap.Podcasts)
 			{
 				await pod.Value.CheckForNew();
@@ -68,6 +70,7 @@ namespace PodcastHelper.Pages
 			await PodcastFunctions.UpdateLatestPlayedList().ConfigureAwait(false);
 			errorData.Error = "";
 			VlcApi.DoNothing();
+			isLoading = false;
 		}
 
 		private void OnMainWindowSizeChanged(double width, double height)
@@ -83,6 +86,15 @@ namespace PodcastHelper.Pages
 		private void OnRecentPlayListUpdate()
 		{
 			recentPlayedListData.UpdateRecentList(PodcastFunctions.LatestPlayedList);
+		}
+
+		private void RefreshClicked(object sender, RoutedEventArgs e)
+		{
+			if (!isLoading)
+			{
+				errorData.Error = "Loading...";
+				Task.Run(() => InitializePodcasts());
+			}
 		}
 
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
@@ -162,6 +174,18 @@ namespace PodcastHelper.Pages
 		private void StopClicked(object sender, RoutedEventArgs e)
 		{
 			PodcastFunctions.StopCommand().ConfigureAwait(false);
+		}
+
+		private void HorizontalScrollMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			if (sender is ScrollViewer scrollviewer)
+			{
+				if (e.Delta > 0)
+					scrollviewer.LineLeft();
+				else
+					scrollviewer.LineRight();
+				e.Handled = true;
+			}
 		}
 	}
 }

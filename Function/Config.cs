@@ -108,6 +108,9 @@ namespace PodcastHelper.Function
 			try
 			{
 				placement = Config.Instance.ConfigObject.WindowPlacement;
+				//If the top and bottom are both 0 it probably means the config file had it wiped and we want to go back to defaults.
+				if (placement.normalPosition.Bottom == 0 && placement.normalPosition.Top == 0)
+					return;
 
 				placement.length = Marshal.SizeOf(typeof(WINDOWPLACEMENT));
 				placement.flags = 0;

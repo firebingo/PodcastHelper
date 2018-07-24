@@ -20,29 +20,10 @@
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
-	<Grid Background="{StaticResource WindowBackgroundColor}">
-		<!--<DockPanel Height="20" VerticalAlignment="Top">
-			<Menu DockPanel.Dock="Top" Background="{StaticResource WindowBackgroundColor}">
-				<MenuItem Header="_File" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}">
-					<MenuItem Header="_New Map" Click="newMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<Separator Style="{StaticResource topBarSeperatorStyle}"/>
-					<MenuItem Header="_Open Map" Click="openMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<MenuItem Header="_Import Map" Click="importMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<Separator Style="{StaticResource topBarSeperatorStyle}" />
-					<MenuItem Header="_Save Map" Click="saveMap" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-				</MenuItem>
-				<MenuItem Header="_View" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}">
-					<MenuItem Header="_Terrain" Name="terrainView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}"  />
-					<MenuItem Header="_Ore Count" Name="oreView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<MenuItem Header="_Crystal Count" Name="crystalView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<MenuItem Header="_Special" Name="specialView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<MenuItem Header="_Building" Name="buildingView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-					<MenuItem Header="_Unit" Name="unitView" Unchecked="viewUnchecked" Checked="viewChecked" IsCheckable="True" Foreground="{StaticResource TextForegroundColor}" Style="{StaticResource topBarContextMenuItemStyle}" />
-				</MenuItem>
-			</Menu>
-		</DockPanel>-->
-		<Grid>
-			<Frame Name="mainPage" Source="../Pages/MainPage.xaml"></Frame>
+    <Grid Background="{StaticResource WindowBackgroundColor}">
+        <Grid>
+			<Frame Visibility="Collapsed" Name="mainPage" Source="../Pages/MainPage.xaml"></Frame>
+            <Frame Visibility="Collapsed" Name="momentsPage" Source="../Pages/MomentsPage.xaml"></Frame>
 		</Grid>
 	</Grid>
 </Window>

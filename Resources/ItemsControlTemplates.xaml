@@ -13,7 +13,7 @@
 				<DataTemplate>
 					<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="210" />
+							<ColumnDefinition Width="190" />
 							<ColumnDefinition Width="75" />
 						</Grid.ColumnDefinitions>
 						<TextBlock>
@@ -32,25 +32,25 @@
 		</ItemsControl>
 	</ControlTemplate>
 
-	<ControlTemplate x:Key ="SearchListTemplate" TargetType="{x:Type ItemsControl}">
-		<ItemsControl Name="podcastSearchItems" ItemsSource="{Binding Path=SearchResults}">
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<Grid Style="{StaticResource baseGridStyle}" Background="Transparent" MouseUp="SelectEpisodeClicked">
-						<StackPanel>
-							<TextBlock>
-								<TextBlock.Text>
-									<MultiBinding StringFormat="{}{0} - Episode: {1}">
-										<Binding Path="PrimaryName" />
-										<Binding Path="Episode.EpisodeNumber" />
-									</MultiBinding>
-								</TextBlock.Text>
-							</TextBlock>
-							<TextBlock FontSize="{StaticResource SubFontSize}" Foreground="{StaticResource TextSubForegroundColor}" Text="{Binding Path=Episode.PublishDateUtc, StringFormat=yyyy/MM/dd}"></TextBlock>
-						</StackPanel>
-					</Grid>
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
-	</ControlTemplate>
+    <ControlTemplate x:Key ="SearchListTemplate" TargetType="{x:Type ItemsControl}">
+        <ItemsControl Name="podcastSearchItems" ItemsSource="{Binding Path=SearchResults}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Style="{StaticResource baseGridStyle}" Background="Transparent" MouseUp="SelectEpisodeClicked">
+                        <StackPanel>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} - Episode: {1}">
+                                        <Binding Path="PrimaryName" />
+                                        <Binding Path="Episode.EpisodeNumber" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock FontSize="{StaticResource SubFontSize}" Foreground="{StaticResource TextSubForegroundColor}" Text="{Binding Path=Episode.PublishDateUtc, StringFormat=yyyy/MM/dd}"></TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </ControlTemplate>
 </ResourceDictionary>

@@ -6,95 +6,116 @@
       mc:Ignorable="d" 
       d:DesignHeight="410" d:DesignWidth="1040"
       Title="MainPage" >
-	<Page.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceDictionary Source="../Resources/Styles.xaml"/>
-				<ResourceDictionary Source="../Resources/Controls.xaml"/>
-				<ResourceDictionary Source="../Resources/ItemsControlTemplates.xaml"/>
-			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
-	</Page.Resources>
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/Styles.xaml"/>
+                <ResourceDictionary Source="../Resources/Controls.xaml"/>
+                <ResourceDictionary Source="../Resources/ItemsControlTemplates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
 
-	<Grid Style="{StaticResource baseGridStyle}" >
-		<StackPanel>
-			<Grid x:Name="podcastInfo" VerticalAlignment="Center">
-				<Border BorderThickness="1" Margin="15" Height="300" Width="325" HorizontalAlignment="Left" VerticalAlignment="Top">
-					<Grid x:Name="recentPodcastList" Margin="5">
-						<StackPanel>
-							<TextBlock Height="20" Text="New Podcasts:"></TextBlock>
-							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
-								<ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
-							</ScrollViewer>
-							<TextBlock Height="20" Text="Recently Played:"></TextBlock>
-							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
-								<ItemsControl Name="podcastRecentPlayedItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
-							</ScrollViewer>
-						</StackPanel>
-					</Grid>
-				</Border>
-				<Border BorderThickness="1" Margin="15" Height="300" Width="325" HorizontalAlignment="Right" VerticalAlignment="Top">
-					<Grid x:Name="searchPodcastList" Margin="5">
-						<StackPanel>
-							<WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
-								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}" KeyUp="SearchPodcastKeyUp"></TextBox>
-								<Button Padding="5,0"  Click="SearchPodcastsClicked">Search</Button>
-							</WrapPanel>
-							<ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding Path=MaxHeight}" MinHeight="125">
-								<ItemsControl Name="podcastSearchItems" Template="{StaticResource ResourceKey=SearchListTemplate}"></ItemsControl>
-							</ScrollViewer>
-							<Border Height="175px" BorderThickness="0,1,0,0" Visibility="{Binding Path=DataContext.ShowCurrent, RelativeSource={RelativeSource AncestorType={x:Type Grid}}}" DataContext="{Binding Path=CurrentEpisode}">
-								<Grid Height="175px" Margin="0,10,0,0">
-									<StackPanel>
-										<TextBlock Text="{Binding Path=Episode.Title, StringFormat=Title: {0}}"></TextBlock>
-										<TextBlock>
-											<TextBlock.Text>
-												<MultiBinding StringFormat="{}Release Date: {0:yyyy/MM/dd}">
-													<Binding Path="Episode.PublishDateUtc"/>
-												</MultiBinding>
-											</TextBlock.Text>
-										</TextBlock>
-										<TextBlock Text="{Binding Path=Episode.Description, StringFormat=Description: {0}}" TextWrapping="Wrap" MaxHeight="30"></TextBlock>
-										<!--<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>-->
-										<TextBlock Text="{Binding Path=Episode.Progress.Length, StringFormat=Length: {0:hh\\:mm\\:ss}}"></TextBlock>
-										<TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0:hh\\:mm\\:ss}}"></TextBlock>
-										<Grid HorizontalAlignment="Stretch">
-											<Grid.ColumnDefinitions>
-												<ColumnDefinition />
-												<ColumnDefinition />
-												<ColumnDefinition />
-											</Grid.ColumnDefinitions>
-											<Button Grid.Column="0" Margin="0,5,5,5" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
-											<Button Grid.Column="0" Margin="0,5,5,5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Click="SummaryPlayClicked">Play</Button>
-											<Button Grid.Column="1" Margin="5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Click="SummaryPlayStartClicked">Play Start</Button>
-											<Button Grid.Column="2" Margin="5" Click="CloseSearchSummary">Close</Button>
-										</Grid>
-									</StackPanel>
-								</Grid>
-							</Border>
-						</StackPanel>
-					</Grid>
-				</Border>
-				<Grid x:Name="errorGrid" HorizontalAlignment="Center">
-					<Label HorizontalAlignment="Center" FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
-				</Grid>
-				<Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Name="playerControls">
-					<WrapPanel>
-						<Button FontSize="16" Width="48" FontWeight="Bold" Margin="1" Click="PlayClicked">▶/❚❚</Button>
-						<Button FontSize="16" Width="24" FontWeight="Bold" Margin="1" Click="StopClicked">■</Button>
-					</WrapPanel>
-				</Grid>
-			</Grid>
-		</StackPanel>
-		<Grid x:Name="timeSlider" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="{Binding Path=Width}" Margin="0,0,0,10">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
-			<TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
-			<Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
-			<TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
-		</Grid>
-	</Grid>
+    <Grid Style="{StaticResource baseGridStyle}" >
+        <StackPanel>
+            <Grid x:Name="podcastInfo" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="330" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="330" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderThickness="1" Margin="15" Height="300" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <Grid x:Name="recentPodcastList" Margin="5">
+                        <StackPanel>
+                            <TextBlock Height="20" Text="New Podcasts:"></TextBlock>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
+                                <ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
+                            </ScrollViewer>
+                            <TextBlock Height="20" Text="Recently Played:"></TextBlock>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
+                                <ItemsControl Name="podcastRecentPlayedItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1" Margin="5, 15">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <Grid Width="Auto" Grid.Row="0" x:Name="otherControls" HorizontalAlignment="Stretch">
+                        <Button HorizontalAlignment="Left" Padding="5,0" Margin="1" Click="RefreshClicked">Refresh</Button>
+                        <Button HorizontalAlignment="Right" Padding="5,0" Margin="1" Click="RefreshClicked">Moments▶</Button>
+                    </Grid>
+                    <Grid Grid.Row="1" x:Name="errorGrid" HorizontalAlignment="Center">
+                        <Label FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
+                    </Grid>
+                    <Grid Grid.Row="3" VerticalAlignment="Bottom" HorizontalAlignment="Center" Name="playerControls">
+                        <WrapPanel>
+                            <Button FontSize="16" Width="48" FontWeight="Bold" Margin="1" Click="PlayClicked">▶/❚❚</Button>
+                            <Button FontSize="16" Width="24" FontWeight="Bold" Margin="1" Click="StopClicked">■</Button>
+                        </WrapPanel>
+                    </Grid>
+                </Grid>
+                <Border Grid.Column="2" BorderThickness="1" Margin="15" Height="300" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                    <Grid x:Name="searchPodcastList" Margin="5">
+                        <StackPanel>
+                            <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}" KeyUp="SearchPodcastKeyUp"></TextBox>
+                                <Button Padding="5,0" Click="SearchPodcastsClicked">Search</Button>
+                            </WrapPanel>
+                            <ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding Path=MaxHeight}" MinHeight="125">
+                                <ItemsControl Name="podcastSearchItems" Template="{StaticResource ResourceKey=SearchListTemplate}"></ItemsControl>
+                            </ScrollViewer>
+                            <Border Height="175" BorderThickness="0,1,0,0" Visibility="{Binding Path=DataContext.ShowCurrent, RelativeSource={RelativeSource AncestorType={x:Type Grid}}}" DataContext="{Binding Path=CurrentEpisode}">
+                                <Grid Height="175" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" PreviewMouseWheel="HorizontalScrollMouseWheel">
+                                            <TextBlock Text="{Binding Path=Episode.Title, StringFormat=Title: {0}}"></TextBlock>
+                                        </ScrollViewer>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}Release Date: {0:yyyy/MM/dd}">
+                                                    <Binding Path="Episode.PublishDateUtc"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <ScrollViewer VerticalScrollBarVisibility="Hidden" Height="31" MaxHeight="31">
+                                            <TextBlock Text="{Binding Path=Episode.Description, StringFormat=Description: {0}}" TextWrapping="Wrap"></TextBlock>
+                                        </ScrollViewer>
+                                        <!--<TextBlock Text="{Binding Path=Episode.WatchCount, StringFormat=Watches: {0}}"></TextBlock>-->
+                                        <TextBlock Text="{Binding Path=Episode.Progress.Length, StringFormat=Length: {0:hh\\:mm\\:ss}}"></TextBlock>
+                                        <TextBlock Text="{Binding Path=Episode.Progress.ProgressTime, StringFormat=Last Progress {0:hh\\:mm\\:ss}}"></TextBlock>
+                                        <Grid HorizontalAlignment="Stretch">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Button Grid.Column="0" Margin="0,5,5,5" Visibility="{Binding Path=NotIsDownloaded, Converter={StaticResource BoolToVis} }" Click="DownloadRecentClicked">Download</Button>
+                                            <Button Grid.Column="0" Margin="0,5,5,5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Click="SummaryPlayClicked">Play</Button>
+                                            <Button Grid.Column="1" Margin="5" Visibility="{Binding Path=Episode.IsDownloaded, Converter={StaticResource BoolToVis} }" Click="SummaryPlayStartClicked">Play Start</Button>
+                                            <Button Grid.Column="2" Margin="5" Click="CloseSearchSummary">Close</Button>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </StackPanel>
+        <Grid x:Name="timeSlider" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="{Binding Path=Width}" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
+            <Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
+            <TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
+        </Grid>
+    </Grid>
 </Page>
