@@ -41,7 +41,7 @@ namespace PodcastHelper.Helpers
 		{
 			var ret = -1;
 
-			if (!string.IsNullOrWhiteSpace(item.Id))
+			if (!string.IsNullOrWhiteSpace(item.Id) && item.Id.Length < 5 && !Guid.TryParse(item.Id, out _))
 				ret = ParseEpisodeNumber(item.Id);
 			if (ret == -1)
 				ret = ParseEpisodeNumber(item.Title.Text);

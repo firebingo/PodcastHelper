@@ -23,11 +23,11 @@
 					<Grid x:Name="recentPodcastList" Margin="5">
 						<StackPanel>
 							<TextBlock Height="20" Text="New Podcasts:"></TextBlock>
-							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="130" MaxHeight="130">
+							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
 								<ItemsControl Name="podcastListItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
 							</ScrollViewer>
 							<TextBlock Height="20" Text="Recently Played:"></TextBlock>
-							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="130" MaxHeight="130">
+							<ScrollViewer VerticalScrollBarVisibility="Auto" Height="125" MaxHeight="125">
 								<ItemsControl Name="podcastRecentPlayedItems" Template="{StaticResource ResourceKey=RecentListTemplate}"></ItemsControl>
 							</ScrollViewer>
 						</StackPanel>
@@ -38,7 +38,7 @@
 						<StackPanel>
 							<WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
 								<TextBox Width="100" BorderThickness="1,1,0,1" Text="{Binding Path=SearchString, Mode=TwoWay}" KeyUp="SearchPodcastKeyUp"></TextBox>
-								<Button Click="SearchPodcastsClicked">Search</Button>
+								<Button Padding="5,0"  Click="SearchPodcastsClicked">Search</Button>
 							</WrapPanel>
 							<ScrollViewer Margin="0,10,0,0" VerticalScrollBarVisibility="Auto" MaxHeight="{Binding Path=MaxHeight}" MinHeight="125">
 								<ItemsControl Name="podcastSearchItems" Template="{StaticResource ResourceKey=SearchListTemplate}"></ItemsControl>

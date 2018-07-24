@@ -53,6 +53,9 @@ namespace PodcastHelper.Models
 			}
 		}
 
+		//[JsonIgnore]
+		//XmlReaderSettings _xmlSettings = new XmlReaderSettings();
+
 		public PodcastDirectory()
 		{
 			Names = new List<string>() { "Null Podcast" };
@@ -65,6 +68,8 @@ namespace PodcastHelper.Models
 			LastPlayed = 0;
 			//_hasLatest = false;
 			_episodes = null;
+			//_xmlSettings.DtdProcessing = DtdProcessing.Parse;
+			//_xmlSettings.MaxCharactersFromEntities = 2048;
 		}
 
 		public void CheckListLoaded()
@@ -110,13 +115,20 @@ namespace PodcastHelper.Models
 
 		public Task CheckForDownloadedEpisodes()
 		{
-			var files = GetRootAndOneSubFiles(Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath));
-			foreach (var ep in _episodes)
+			try
 			{
-				if (files.Any(x => Path.GetFileName(x) == ep.Value.FileName))
-					ep.Value.IsDownloaded = true;
-				else
-					ep.Value.IsDownloaded = false;
+				var files = GetRootAndOneSubFiles(Path.Combine(Config.Instance.ConfigObject.RootPath, FolderPath));
+				foreach (var ep in _episodes)
+				{
+					if (files.Any(x => Path.GetFileName(x) == ep.Value.FileName))
+						ep.Value.IsDownloaded = true;
+					else
+						ep.Value.IsDownloaded = false;
+				}
+			}
+			catch(Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
 			}
 			Config.Instance.SaveConfig();
 			return Task.FromResult(0);
@@ -226,7 +238,7 @@ namespace PodcastHelper.Models
 		private string[] GetRootAndOneSubFiles(string path)
 		{
 			var retval = new List<string>();
-
+			Directory.CreateDirectory(path);
 			var subDirectories = Directory.GetDirectories(path);
 			retval.AddRange(Directory.GetFiles(path));
 			foreach (var d in subDirectories)
