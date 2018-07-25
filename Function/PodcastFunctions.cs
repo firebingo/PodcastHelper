@@ -2,6 +2,7 @@
 using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,9 @@ namespace PodcastHelper.Function
 		public static event OnUpdate UpdateLatestPlayedListEvent;
 
 		public static PlayingState PlayingState = PlayingState.Stopped;
+		private static string _playingAlbumArt = "";
+		public delegate void OnAlbumArtUpdate(string uri);
+		public static event OnAlbumArtUpdate AlbumArtUpdated;
 		private static PodcastEpisode _playingEpisode = null;
 		public delegate void playingEpisodeChanged(PodcastEpisode episode);
 		public static event playingEpisodeChanged PlayingEpisodeChangedEvent;
@@ -47,6 +51,22 @@ namespace PodcastHelper.Function
 			get
 			{
 				return _latestPlayedCache;
+			}
+		}
+
+		public static string PlayingAlbumArt
+		{
+			get
+			{
+				return _playingAlbumArt;
+			}
+			set
+			{
+				if (value != _playingAlbumArt)
+				{
+					_playingAlbumArt = value;
+					AlbumArtUpdated?.Invoke(_playingAlbumArt);
+				}
 			}
 		}
 
@@ -147,6 +167,26 @@ namespace PodcastHelper.Function
 		public static async Task DownloadEpisode(int ep, PodcastDirectory podcast)
 		{
 			await podcast.DownloadEpisode(ep);
+		}
+
+		public static string CheckForPodcastAlbumArt(string shortCode)
+		{
+			try
+			{
+				var path = Path.Combine(Config.Instance.ConfigObject.RootPath, Config.Instance.ConfigObject.PodcastMap.Podcasts[shortCode].FolderPath);
+				if (!Directory.Exists(path))
+					return "";
+				var files = Directory.EnumerateFiles(path, "*cover.*");
+				if (files.Count() == 0)
+					return "";
+				else
+					return files.First();
+			}
+			catch(Exception ex)
+			{
+				ErrorTracker.CurrentError = ex.Message;
+				return "";
+			}
 		}
 
 		public static async Task PlayFile(PodcastEpisodeView ep, bool fromStart = false)

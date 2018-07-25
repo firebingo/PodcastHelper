@@ -30,6 +30,7 @@ namespace PodcastHelper.Pages
 		private ErrorData errorData = null;
 		private SearchPodcastData searchData = null;
 		private TimeSliderData sliderData = null;
+		private OtherMainPageData otherPageData = null;
 		private bool isLoading = false;
 
 		public MainPage()
@@ -48,8 +49,11 @@ namespace PodcastHelper.Pages
 			errorData.Error = "Loading...";
 			sliderData = new TimeSliderData();
 			timeSlider.DataContext = sliderData;
+			otherPageData = new OtherMainPageData();
+			AlbumArt.DataContext = otherPageData;
 			PodcastFunctions.UpdateLatestListEvent += OnLatestListUpdate;
 			PodcastFunctions.UpdateLatestPlayedListEvent += OnRecentPlayListUpdate;
+			PodcastFunctions.AlbumArtUpdated += OnAlbumArtUpdated;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
@@ -86,6 +90,23 @@ namespace PodcastHelper.Pages
 		private void OnRecentPlayListUpdate()
 		{
 			recentPlayedListData.UpdateRecentList(PodcastFunctions.LatestPlayedList);
+		}
+
+		private void OnAlbumArtUpdated(string uri)
+		{
+			if (string.IsNullOrWhiteSpace(uri))
+				otherPageData.AlbumArt = null;
+			else
+			{
+				var art = new BitmapImage();
+				art.BeginInit();
+				art.UriSource = new Uri(uri);
+				art.DecodePixelHeight = 175;
+				art.EndInit();
+				art.Freeze();
+
+				otherPageData.AlbumArt = art;
+			}
 		}
 
 		private void RefreshClicked(object sender, RoutedEventArgs e)

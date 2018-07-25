@@ -9,7 +9,7 @@
 	    Height="410"
 	    Width="1040"
 		MinHeight="410"
-		MinWidth="780"
+		MinWidth="870"
 		Closing="WindowClosing"
 		SizeChanged="WindowSizeChanged">
 	<Window.Resources>

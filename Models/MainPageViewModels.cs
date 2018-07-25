@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 
 namespace PodcastHelper.Models
 {
@@ -309,7 +310,7 @@ namespace PodcastHelper.Models
 		{
 			_width = 0;
 			_sliderPos = 0.0;
-			_maxValue = new TimeSpan(0,0,0);
+			_maxValue = new TimeSpan(0, 0, 0);
 			PodcastFunctions.PlayingEpisodeChangedEvent += PlayingEpisodeChanged;
 		}
 
@@ -318,13 +319,36 @@ namespace PodcastHelper.Models
 			if (episode != null)
 			{
 				SliderPosition = episode.Progress.Progress * 100;
-				if(_maxValue.Ticks != episode.Progress.Length.Ticks)
+				if (_maxValue.Ticks != episode.Progress.Length.Ticks)
 					MaxValue = episode.Progress.Length;
 			}
 			else
 			{
 				SliderPosition = 0.0;
 				MaxValue = new TimeSpan(0, 0, 0);
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		private void NotifyPropertyChanged(string info)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+		}
+	}
+
+	public class OtherMainPageData : INotifyPropertyChanged
+	{
+		private ImageSource _albumArt;
+		public ImageSource AlbumArt
+		{
+			get
+			{
+				return _albumArt;
+			}
+			set
+			{
+				_albumArt = value;
+				NotifyPropertyChanged("AlbumArt");
 			}
 		}
 

@@ -13,7 +13,7 @@
 				<DataTemplate>
 					<Grid Margin="0,0,0,5" Style="{StaticResource baseGridStyle}">
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="190" />
+							<ColumnDefinition Width="200" />
 							<ColumnDefinition Width="75" />
 						</Grid.ColumnDefinitions>
 						<TextBlock>

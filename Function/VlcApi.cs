@@ -3,6 +3,7 @@ using PodcastHelper.Helpers;
 using PodcastHelper.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -175,6 +176,13 @@ namespace PodcastHelper.Function
 							ep.Progress.Length = status.Length > 0 ? new TimeSpan(0, 0, status.Length) : ep.Progress.Length;
 							ep.Progress.Progress = status.Position > 0 ? status.Position : (status.Time / status.Length);
 							Config.Instance.SaveConfig();
+							var existingArt = PodcastFunctions.CheckForPodcastAlbumArt(ep.PodcastShortCode);
+							if (!string.IsNullOrWhiteSpace(existingArt) && File.Exists(existingArt))
+								PodcastFunctions.PlayingAlbumArt = $"file:///{(existingArt.Replace("\\", "/"))}";
+							else if (!string.IsNullOrWhiteSpace(status.FileInfo.ArtworkUrl))
+								PodcastFunctions.PlayingAlbumArt = status.FileInfo.ArtworkUrl;
+							else
+								PodcastFunctions.PlayingAlbumArt = null;
 							PodcastFunctions.PlayingState = status.State;
 							PodcastFunctions.PlayingEpisode = ep;
 						}
@@ -183,6 +191,7 @@ namespace PodcastHelper.Function
 					}
 					else if (status.State == PlayingState.Stopped)
 					{
+						PodcastFunctions.PlayingAlbumArt = "";
 						PodcastFunctions.PlayingState = status.State;
 						PodcastFunctions.PlayingEpisode = null;
 						_nextUpdate = DateTime.UtcNow + _defaultNextTime;
@@ -305,6 +314,9 @@ namespace PodcastHelper.Function
 								{
 									case "filename":
 										ret.FileName = node.InnerText;
+										break;
+									case "artwork_url":
+										ret.ArtworkUrl = node.InnerText;
 										break;
 									default:
 										break;

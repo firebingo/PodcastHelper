@@ -94,7 +94,7 @@
     <Compile Include="Models\Config.cs" />
     <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Models\PodcastDirectoryMap.cs" />
-    <Compile Include="Models\ViewModels.cs" />
+    <Compile Include="Models\MainPageViewModels.cs" />
     <Compile Include="Models\Vlc.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
