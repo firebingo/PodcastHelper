@@ -30,8 +30,9 @@ namespace PodcastHelper.Windows
 
 		public MainWindow()
 		{
-			visiblePage = VisiblePage.Control;
 			InitializeComponent();
+
+			visiblePage = VisiblePage.Control;
 		}
 
 		protected override void OnSourceInitialized(EventArgs e)
@@ -54,6 +55,21 @@ namespace PodcastHelper.Windows
 		private void WindowSizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
+		}
+
+		private void TopBarMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			DragMove();
+		}
+
+		private void MinimizeClicked(object sender, RoutedEventArgs e)
+		{
+			WindowState = WindowState.Minimized;
+		}
+
+		private void CloseClicked(object sender, RoutedEventArgs e)
+		{
+			Close();
 		}
 	}
 

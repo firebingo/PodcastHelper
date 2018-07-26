@@ -5,19 +5,19 @@
 			 xmlns:sys="clr-namespace:System;assembly=mscorlib"
 			 StartupUri="Windows/MainWindow.xaml">
     <Application.Resources>
-		<SolidColorBrush x:Key="WindowBackgroundColor" Color="#FF282828"/>
+		<SolidColorBrush x:Key="WindowBackgroundColor" Color="#EE282828"/>
 		<SolidColorBrush x:Key="TextForegroundColor" Color="#FFFCFCFC"/>
 		<SolidColorBrush x:Key="TextSubForegroundColor" Color="#FFC0C0C0"/>
 		<SolidColorBrush x:Key="TextBackgroundColor" Color="#FF505050"/>
-		<SolidColorBrush x:Key="TextBorderColor" Color="#BF404040"/>
-		<SolidColorBrush x:Key="BarBackgroundColor" Color="#FF404040"/>
-		<SolidColorBrush x:Key="ButtonHighlightColor" Color="#FF505050"/>
-		<SolidColorBrush x:Key="SubMenuHighlightColor" Color="#FF606060"/>
-		<SolidColorBrush x:Key="TileBorderColor" Color="#BF404040"/>
-		<SolidColorBrush x:Key="GlyphBrush" Color="#444" />
-		<BooleanToVisibilityConverter x:Key="BoolToVis" />
+		<SolidColorBrush x:Key="TextBorderColor" Color="#CF404040"/>
+        <SolidColorBrush x:Key="TextBrightBorderColor" Color="#CF606060"/>
+        <SolidColorBrush x:Key="BarBackgroundColor" Color="#FF404040"/>
+        <SolidColorBrush x:Key="TopBarOtherHover" Color="#CF393939"/>
+        <SolidColorBrush x:Key="TopBarCloseHover" Color="#CFCC0000"/>
+        <SolidColorBrush x:Key="GlyphBrush" Color="#444" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <local:NullVisibilityConverter x:Key="NullToVisibilityConverter"/>
 		<sys:Double x:Key="BaseFontSize">12</sys:Double>
-		<sys:Double x:Key="SubFontSize">8</sys:Double>
-		<local:NullVisibilityConverter x:Key="NullToVisibilityConverter"/>
-	</Application.Resources>
+        <sys:Double x:Key="SubFontSize">8</sys:Double>
+    </Application.Resources>
 </Application>
