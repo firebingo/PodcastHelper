@@ -71,6 +71,16 @@ namespace PodcastHelper.Windows
 		{
 			Close();
 		}
+
+		private void WindowActivated(object sender, EventArgs e)
+		{
+			topGridBorder.BorderBrush = Application.Current.Resources["TopBarBorderActivated"] as SolidColorBrush;
+		}
+
+		private void WindowDeactivated(object sender, EventArgs e)
+		{
+			topGridBorder.BorderBrush = Application.Current.Resources["TopBarBorderDeactivated"] as SolidColorBrush;
+		}
 	}
 
 	public enum VisiblePage

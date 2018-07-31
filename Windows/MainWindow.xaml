@@ -14,7 +14,9 @@
 		SizeChanged="WindowSizeChanged"
         AllowsTransparency="True"
         WindowStyle="None"
-        ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip"
+        Activated="WindowActivated"
+        Deactivated="WindowDeactivated">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -32,7 +34,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid Style="{StaticResource topGridStyle}" Grid.Row="0">
-            <Border BorderThickness="0,0,0,1" Height="30">
+            <Border x:Name="topGridBorder" BorderThickness="0,0,0,1" Height="30">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

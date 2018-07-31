@@ -34,7 +34,7 @@
                 <Setter Property="Foreground" Value="{StaticResource TextForegroundColor}" />
             </Style>
             <Style TargetType="{x:Type Border}">
-                <Setter Property="BorderBrush" Value="{StaticResource TextBrightBorderColor}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TopBarBorderActivated}" />
             </Style>
         </Style.Resources>
     </Style>

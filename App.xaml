@@ -14,6 +14,8 @@
         <SolidColorBrush x:Key="BarBackgroundColor" Color="#FF404040"/>
         <SolidColorBrush x:Key="TopBarOtherHover" Color="#CF393939"/>
         <SolidColorBrush x:Key="TopBarCloseHover" Color="#CFCC0000"/>
+        <SolidColorBrush x:Key="TopBarBorderActivated" Color="#DF909090"/>
+        <SolidColorBrush x:Key="TopBarBorderDeactivated" Color="#CF606060"/>
         <SolidColorBrush x:Key="GlyphBrush" Color="#444" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <local:NullVisibilityConverter x:Key="NullToVisibilityConverter"/>
