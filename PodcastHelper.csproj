@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>packages\Newtonsoft.Json.11.0.1-beta3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -94,6 +94,8 @@
     <Compile Include="Models\Config.cs" />
     <Compile Include="Helpers\Helpers.cs" />
     <Compile Include="Models\MainPageViewModels.cs" />
+    <Compile Include="Models\MomentsConfig.cs" />
+    <Compile Include="Models\MomentsPageViewModels.cs" />
     <Compile Include="Models\PodcastDirectoryMap.cs" />
     <Compile Include="Models\Vlc.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">

@@ -118,6 +118,12 @@ namespace PodcastHelper.Pages
 			}
 		}
 
+		private void MomentsClicked(object sender, RoutedEventArgs e)
+		{
+			if(Window.GetWindow(this) is MainWindow w)
+				w.VisiblePage = VisiblePage.Moments;
+		}
+
 		private void DownloadRecentClicked(object sender, RoutedEventArgs e)
 		{
 			if ((sender as Button)?.DataContext is PodcastEpisodeView kvp)
@@ -181,10 +187,19 @@ namespace PodcastHelper.Pages
 				PodcastFunctions.PlayFile(kvp, true).ConfigureAwait(false);
 		}
 
+		private void TimeSliderMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (sender is Slider slider)
+				sliderData.MovingTimeSlider = true;
+		}
+
 		private void TimeSliderMouseUp(object sender, MouseButtonEventArgs e)
 		{
-			if(sender is Slider slider)
+			if (sender is Slider slider)
+			{
+				sliderData.MovingTimeSlider = false;
 				PodcastFunctions.SeekFile(slider.Value).ConfigureAwait(false);
+			}
 		}
 
 		private void PlayClicked(object sender, RoutedEventArgs e)

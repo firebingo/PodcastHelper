@@ -283,6 +283,8 @@ namespace PodcastHelper.Models
 			}
 		}
 
+		public bool MovingTimeSlider { get; set; }
+
 		private TimeSpan _maxValue;
 		public TimeSpan MaxValue
 		{
@@ -318,7 +320,8 @@ namespace PodcastHelper.Models
 		{
 			if (episode != null)
 			{
-				SliderPosition = episode.Progress.Progress * 100;
+				if(!MovingTimeSlider)
+					SliderPosition = episode.Progress.Progress * 100;
 				if (_maxValue.Ticks != episode.Progress.Length.Ticks)
 					MaxValue = episode.Progress.Length;
 			}

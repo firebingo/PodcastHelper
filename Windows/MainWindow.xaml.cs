@@ -26,13 +26,26 @@ namespace PodcastHelper.Windows
 	{
 		public delegate void onWindowChanged(double width, double height);
 		public static event onWindowChanged OnMainWindowSizeChanged;
-		private VisiblePage visiblePage;
+		private List<Control> _pages;
+		private VisiblePage _visiblePage;
+		public VisiblePage VisiblePage
+		{
+			get { return _visiblePage; }
+			set
+			{
+				_visiblePage = value;
+				ChangePage();
+			}
+		}
 
 		public MainWindow()
 		{
 			InitializeComponent();
 
-			visiblePage = VisiblePage.Control;
+			_visiblePage = VisiblePage.Control;
+			_pages = new List<Control>();
+			_pages.Add(mainPage);
+			_pages.Add(momentsPage);
 		}
 
 		protected override void OnSourceInitialized(EventArgs e)
@@ -42,6 +55,23 @@ namespace PodcastHelper.Windows
 			OnMainWindowSizeChanged?.Invoke(this.Width, this.Height);
 
 			mainPage.Visibility = Visibility.Visible;
+		}
+
+		private void ChangePage()
+		{
+			foreach(var p in _pages)
+			{
+				p.Visibility = Visibility.Hidden;
+			}
+			switch (_visiblePage)
+			{
+				case VisiblePage.Control:
+					mainPage.Visibility = Visibility.Visible;
+					break;
+				case VisiblePage.Moments:
+					momentsPage.Visibility = Visibility.Visible;
+					break;
+			}
 		}
 
 		private void WindowClosing(object sender, CancelEventArgs e)
@@ -85,6 +115,7 @@ namespace PodcastHelper.Windows
 
 	public enum VisiblePage
 	{
-		Control = 0
+		Control = 0,
+		Moments = 1
 	}
 }

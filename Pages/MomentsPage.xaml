@@ -17,6 +17,6 @@
         </ResourceDictionary>
     </Page.Resources>
     <Grid>
-        
+        <Button HorizontalAlignment="Left" Padding="5,0" Margin="1" Click="ControlsClicked">Controls ◀</Button>
     </Grid>
 </Page>

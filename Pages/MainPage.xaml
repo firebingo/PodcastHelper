@@ -49,7 +49,7 @@
                     </Grid.RowDefinitions>
                     <Grid Width="Auto" Grid.Row="0" x:Name="otherControls" HorizontalAlignment="Stretch">
                         <Button HorizontalAlignment="Left" Padding="5,0" Margin="1" Click="RefreshClicked">Refresh</Button>
-                        <Button HorizontalAlignment="Right" Padding="5,0" Margin="1" Click="RefreshClicked">Moments ▶</Button>
+                        <Button HorizontalAlignment="Right" Padding="5,0" Margin="1" Click="MomentsClicked">Moments ▶</Button>
                     </Grid>
                     <Grid Grid.Row="1" x:Name="errorGrid" HorizontalAlignment="Center">
                         <Label FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>
@@ -119,7 +119,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Path=CurrentValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="0" Margin="0,0,5,0" FontSize="10"></TextBlock>
-            <Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp"/>
+            <Slider Maximum="100" Value="{Binding Path=SliderPosition}" Grid.Column="1" PreviewMouseUp="TimeSliderMouseUp" PreviewMouseDown="TimeSliderMouseDown"/>
             <TextBlock Text="{Binding Path=MaxValue, StringFormat={}{0:hh\\:mm\\:ss}}" Grid.Column="2" Margin="5,0,0,0" FontSize="10"></TextBlock>
         </Grid>
     </Grid>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PodcastHelper.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,5 +25,11 @@ namespace PodcastHelper.Pages
         {
             InitializeComponent();
         }
-    }
+
+		private void ControlsClicked(object sender, RoutedEventArgs e)
+		{
+			if (Window.GetWindow(this) is MainWindow w)
+				w.VisiblePage = VisiblePage.Control;
+		}
+	}
 }
