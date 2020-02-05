@@ -173,7 +173,7 @@ namespace PodcastHelper.Models
 						Title = f.Title?.Text,
 						Description = f.Summary?.Text,
 						PublishDateUtc = f.PublishDate.UtcDateTime,
-						Keywords = keywords.ToArray()
+						Keywords = keywords?.ToArray() ?? new string[0]
 					};
 					if (enclosure != null)
 						episode.FileUri = enclosure;
