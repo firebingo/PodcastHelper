@@ -124,6 +124,8 @@ namespace PodcastHelper.Helpers
 	{
 		public static bool ContainsInvariant(this string str, string innerText)
 		{
+			if (string.IsNullOrWhiteSpace(str))
+				return false;
 			return str.IndexOf(innerText, StringComparison.InvariantCultureIgnoreCase) != -1;
 		}
 	}

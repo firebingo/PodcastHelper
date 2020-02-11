@@ -170,8 +170,8 @@ namespace PodcastHelper.Models
 					{
 						PodcastShortCode = ShortCode,
 						EpisodeNumber = num,
-						Title = f.Title?.Text,
-						Description = f.Summary?.Text,
+						Title = f.Title?.Text ?? string.Empty,
+						Description = f.Summary?.Text ?? string.Empty,
 						PublishDateUtc = f.PublishDate.UtcDateTime,
 						Keywords = keywords?.ToArray() ?? new string[0]
 					};
