@@ -48,8 +48,15 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <Grid Width="Auto" Grid.Row="0" x:Name="otherControls" HorizontalAlignment="Stretch">
-                        <Button HorizontalAlignment="Left" Padding="5,0" Margin="1" Click="RefreshClicked">Refresh</Button>
-                        <Button HorizontalAlignment="Right" Padding="5,0" Margin="1" Click="MomentsClicked">Moments ▶</Button>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Margin="1" Click="RefreshClicked">Refresh</Button>
+                        <ProgressBar Grid.Column="1" Margin="10, 0" Height="25" x:Name="DownloadBar" Minimum="0" Maximum="1" 
+                                     Value="{Binding Path=DownloadProgress, Mode=OneWay}" Visibility="{Binding Path=DownloadingFile, Mode=OneWay, Converter={StaticResource BoolToVis} }"/>
+                        <Button Grid.Column="2" Margin="1" Click="MomentsClicked">Moments ▶</Button>
                     </Grid>
                     <Grid Grid.Row="1" x:Name="errorGrid" HorizontalAlignment="Center">
                         <Label FontSize="10" Margin="2" Foreground="Red" Content="{Binding Path=Error}"></Label>

@@ -25,9 +25,9 @@ namespace PodcastHelper.Function
 		{
 			_webClient = new HttpClient();
 			_runThread = true;
-			_progressThread = new Thread(RunStatusThread);
-			_progressThread.Name = "ApiStatus";
-			_progressThread.Start();
+			//_progressThread = new Thread(RunStatusThread);
+			//_progressThread.Name = "ApiStatus";
+			//_progressThread.Start();
 		}
 
 		//Just need something to activate the static reference and run the constructor.
@@ -208,11 +208,11 @@ namespace PodcastHelper.Function
 			do
 			{
 				Thread.Sleep(500);
-				if (DateTime.UtcNow > _nextUpdate)
-				{
-					_nextUpdate = DateTime.MaxValue;
-					UpdateStatus().ConfigureAwait(false);
-				}
+				//if (DateTime.UtcNow > _nextUpdate)
+				//{
+				//	_nextUpdate = DateTime.MaxValue;
+				//	UpdateStatus().ConfigureAwait(false);
+				//}
 			} while (_runThread);
 
 			return;

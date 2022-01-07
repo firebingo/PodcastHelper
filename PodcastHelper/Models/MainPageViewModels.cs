@@ -338,6 +338,36 @@ namespace PodcastHelper.Models
 
 	public class OtherMainPageData : INotifyPropertyChanged
 	{
+		private bool _downloadingFile;
+		public bool DownloadingFile
+		{
+			get
+			{
+				return _downloadingFile;
+			}
+			set
+			{
+				_downloadingFile = value;
+				NotifyPropertyChanged("DownloadingFile");
+			}
+		}
+
+		private float _downloadProgress;
+		public float DownloadProgress
+		{
+			get
+			{
+				return _downloadProgress;
+			}
+			set
+			{
+				_downloadProgress = value;
+				_downloadingFile = true;
+				NotifyPropertyChanged("DownloadProgress");
+				NotifyPropertyChanged("DownloadingFile");
+			}
+		}
+
 		private ImageSource _albumArt;
 		public ImageSource AlbumArt
 		{

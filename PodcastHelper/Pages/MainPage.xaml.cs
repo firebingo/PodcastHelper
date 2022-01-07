@@ -47,12 +47,15 @@ namespace PodcastHelper.Pages
 			timeSlider.DataContext = sliderData;
 			otherPageData = new OtherMainPageData();
 			AlbumArt.DataContext = otherPageData;
+			DownloadBar.DataContext = otherPageData;
 			PodcastFunctions.UpdateLatestListEvent += OnLatestListUpdate;
 			PodcastFunctions.UpdateLatestPlayedListEvent += OnRecentPlayListUpdate;
 			PodcastFunctions.AlbumArtUpdated += OnAlbumArtUpdated;
 			ItemsControlTemplates.OnDownloadRecentEvent += DownloadRecentClicked;
 			ItemsControlTemplates.OnSelectEpisodeEvent += SelectEpisodeClicked;
 			ItemsControlTemplates.OnPlayEpisodeEvent += PlayRecentClicked;
+			FileDownloader.OnDownloadUpdateEvent += OnDownloadUpdateEvent;
+			FileDownloader.OnDownloadFinishedEvent += OnDownloadFinishedEvent;
 			MainWindow.OnMainWindowSizeChanged += OnMainWindowSizeChanged;
 			Task.Run(() => InitializePodcasts());
 		}
@@ -80,12 +83,18 @@ namespace PodcastHelper.Pages
 
 		private void OnLatestListUpdate()
 		{
-			recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
+			_syncContext.Post((s) =>
+			{
+				recentListData.UpdateRecentList(PodcastFunctions.LatestPodcastList);
+			}, null);
 		}
 
 		private void OnRecentPlayListUpdate()
 		{
-			recentPlayedListData.UpdateRecentList(PodcastFunctions.LatestPlayedList);
+			_syncContext.Post((s) =>
+			{
+				recentPlayedListData.UpdateRecentList(PodcastFunctions.LatestPlayedList);
+			}, null);
 		}
 
 		private void OnAlbumArtUpdated(string uri)
@@ -105,6 +114,22 @@ namespace PodcastHelper.Pages
 
 					otherPageData.AlbumArt = art;
 				}
+			}, null);
+		}
+
+		private void OnDownloadFinishedEvent(bool res, int ep, string shortCode)
+		{
+			_syncContext.Post((s) =>
+			{
+				otherPageData.DownloadingFile = false;
+			}, null);
+		}
+
+		private void OnDownloadUpdateEvent(float progress, int ep, string shortCode)
+		{
+			_syncContext.Post((s) =>
+			{
+				otherPageData.DownloadProgress = progress;
 			}, null);
 		}
 
@@ -131,7 +156,7 @@ namespace PodcastHelper.Pages
 				var ep = kvp.Episode.EpisodeNumber;
 				if (podcast == null)
 					return;
-				PodcastFunctions.DownloadEpisode(ep, podcast);
+				Task.Run(() => PodcastFunctions.DownloadEpisode(ep, podcast));
 			}
 		}
 

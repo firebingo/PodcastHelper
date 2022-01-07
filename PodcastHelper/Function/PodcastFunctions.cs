@@ -228,11 +228,11 @@ namespace PodcastHelper.Function
 			PlayingState = PlayingState.Stopped;
 		}
 
-		private static void RunPlayingThread()
+		private static async void RunPlayingThread()
 		{
 			do
 			{
-				Thread.Sleep(1000);
+				await Task.Delay(1000);
 				if (PlayingState == PlayingState.Playing)
 				{
 					double addTime = 1 / PlayingEpisode.Progress.Length.TotalSeconds;
@@ -240,8 +240,6 @@ namespace PodcastHelper.Function
 					PlayingEpisodeChangedEvent?.Invoke(_playingEpisode);
 				}
 			} while (_runThread);
-
-			return;
 		}
 
 		public static void Kill()
