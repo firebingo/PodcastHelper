@@ -8,12 +8,7 @@ namespace PodcastHelper.Models
 {
 	public class MomentsConfig
 	{
-		public List<PodcastMoment> Moments { get; set; }
-
-		public MomentsConfig()
-		{
-			Moments = new List<PodcastMoment>();
-		}
+		public List<PodcastMoment> Moments { get; set; } = new List<PodcastMoment>();
 	}
 
 	public class PodcastMoment

@@ -6,21 +6,12 @@ namespace PodcastHelper.Models
 {
 	public class ConfigModel
 	{
-		public string RootPath;
-		public string VlcRootUrl;
-		public string VlcUsername;
-		public string VlcPassword;
-		public PodcastDirectoryMap PodcastMap;
-		public WINDOWPLACEMENT WindowPlacement;
-
-		public ConfigModel()
-		{
-			RootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Podcasts");
-			VlcRootUrl = "http://localhost:8080/";
-			VlcUsername = string.Empty;
-			VlcPassword = string.Empty;
-			PodcastMap = new PodcastDirectoryMap();
-		}
+		public string RootPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic), "Podcasts");
+		public string VlcRootUrl { get; set; } = "http://localhost:8080/";
+		public string VlcUsername { get; set; } = string.Empty;
+		public string VlcPassword { get; set; } = string.Empty;
+		public PodcastDirectoryMap PodcastMap { get; set; } = new PodcastDirectoryMap();
+		public WINDOWPLACEMENT WindowPlacement { get; set; }
 	}
 
 	[Serializable]

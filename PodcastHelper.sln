@@ -1,25 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PodcastHelper", "PodcastHelper.csproj", "{DE06552C-53AD-46B9-815C-AB9946A563D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PodcastHelper", "PodcastHelper\PodcastHelper.csproj", "{44F966BD-8BF0-409A-9D92-F503F2E62039}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DE06552C-53AD-46B9-815C-AB9946A563D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE06552C-53AD-46B9-815C-AB9946A563D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE06552C-53AD-46B9-815C-AB9946A563D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE06552C-53AD-46B9-815C-AB9946A563D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F966BD-8BF0-409A-9D92-F503F2E62039}.Debug|x64.ActiveCfg = Debug|x64
+		{44F966BD-8BF0-409A-9D92-F503F2E62039}.Debug|x64.Build.0 = Debug|x64
+		{44F966BD-8BF0-409A-9D92-F503F2E62039}.Release|x64.ActiveCfg = Release|x64
+		{44F966BD-8BF0-409A-9D92-F503F2E62039}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {74E5CC8F-EBE7-40B9-B27E-55492514A3D6}
+		SolutionGuid = {672A6BE0-5C97-41E6-AC1F-023B90229EBB}
 	EndGlobalSection
 EndGlobal

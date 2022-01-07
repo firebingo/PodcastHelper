@@ -3,19 +3,13 @@ using PodcastHelper.Models;
 using PodcastHelper.Resources;
 using PodcastHelper.Windows;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PodcastHelper.Pages
 {
@@ -24,18 +18,20 @@ namespace PodcastHelper.Pages
 	/// </summary>
 	public partial class MainPage : Page
 	{
+		private readonly SynchronizationContext _syncContext;
 		public Config config;
-		private RecentPodcastListData recentListData = null;
-		private RecentPlayedListData recentPlayedListData = null;
-		private ErrorData errorData = null;
-		private SearchPodcastData searchData = null;
-		private TimeSliderData sliderData = null;
-		private OtherMainPageData otherPageData = null;
+		private readonly RecentPodcastListData recentListData = null;
+		private readonly RecentPlayedListData recentPlayedListData = null;
+		private readonly ErrorData errorData = null;
+		private readonly SearchPodcastData searchData = null;
+		private readonly TimeSliderData sliderData = null;
+		private readonly OtherMainPageData otherPageData = null;
 		private bool isLoading = false;
 
 		public MainPage()
 		{
 			InitializeComponent();
+			_syncContext = SynchronizationContext.Current;
 			config = Config.Instance;
 
 			recentListData = new RecentPodcastListData();
@@ -70,8 +66,8 @@ namespace PodcastHelper.Pages
 				await pod.Value.FillNewEpisodes();
 				await pod.Value.CheckForDownloadedEpisodes();
 			}
-			await PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
-			await PodcastFunctions.UpdateLatestPlayedList().ConfigureAwait(false);
+			PodcastFunctions.UpdateLatestPodcastList();
+			PodcastFunctions.UpdateLatestPlayedList();
 			errorData.Error = "";
 			VlcApi.DoNothing();
 			isLoading = false;
@@ -94,19 +90,22 @@ namespace PodcastHelper.Pages
 
 		private void OnAlbumArtUpdated(string uri)
 		{
-			if (string.IsNullOrWhiteSpace(uri))
-				otherPageData.AlbumArt = null;
-			else
+			_syncContext.Post((s) =>
 			{
-				var art = new BitmapImage();
-				art.BeginInit();
-				art.UriSource = new Uri(uri);
-				art.DecodePixelHeight = 175;
-				art.EndInit();
-				art.Freeze();
+				if (string.IsNullOrWhiteSpace(uri))
+					otherPageData.AlbumArt = null;
+				else
+				{
+					var art = new BitmapImage();
+					art.BeginInit();
+					art.UriSource = new Uri(uri);
+					art.DecodePixelHeight = 175;
+					art.EndInit();
+					art.Freeze();
 
-				otherPageData.AlbumArt = art;
-			}
+					otherPageData.AlbumArt = art;
+				}
+			}, null);
 		}
 
 		private void RefreshClicked(object sender, RoutedEventArgs e)
@@ -120,7 +119,7 @@ namespace PodcastHelper.Pages
 
 		private void MomentsClicked(object sender, RoutedEventArgs e)
 		{
-			if(Window.GetWindow(this) is MainWindow w)
+			if (Window.GetWindow(this) is MainWindow w)
 				w.VisiblePage = VisiblePage.Moments;
 		}
 
@@ -132,7 +131,7 @@ namespace PodcastHelper.Pages
 				var ep = kvp.Episode.EpisodeNumber;
 				if (podcast == null)
 					return;
-				PodcastFunctions.DownloadEpisode(ep, podcast).ConfigureAwait(false);
+				PodcastFunctions.DownloadEpisode(ep, podcast);
 			}
 		}
 
@@ -151,7 +150,7 @@ namespace PodcastHelper.Pages
 
 		private void SearchPodcastKeyUp(object sender, KeyEventArgs e)
 		{
-			if(e.Key == Key.Enter && sender is TextBox textBox)
+			if (e.Key == Key.Enter && sender is TextBox textBox)
 			{
 				var res = PodcastFunctions.SearchPodcasts(textBox.Text);
 				searchData.SearchResults.Clear();
@@ -177,7 +176,7 @@ namespace PodcastHelper.Pages
 
 		private void SummaryPlayClicked(object sender, RoutedEventArgs e)
 		{
-			if((sender as Button)?.DataContext is PodcastEpisodeView kvp)
+			if ((sender as Button)?.DataContext is PodcastEpisodeView kvp)
 				PodcastFunctions.PlayFile(kvp, false).ConfigureAwait(false);
 		}
 
@@ -189,7 +188,7 @@ namespace PodcastHelper.Pages
 
 		private void TimeSliderMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			if (sender is Slider slider)
+			if (sender is Slider)
 				sliderData.MovingTimeSlider = true;
 		}
 

@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
-using PodcastHelper.Helpers;
+﻿using PodcastHelper.Helpers;
 using PodcastHelper.Models;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,8 +14,8 @@ namespace PodcastHelper.Function
 {
 	public static class VlcApi
 	{
-		private static HttpClient _webClient = null;
-		private static Thread _progressThread;
+		private static readonly HttpClient _webClient = null;
+		private static readonly Thread _progressThread;
 		private static bool _runThread = true;
 		private static DateTime _nextUpdate = DateTime.MaxValue;
 		private static readonly TimeSpan _defaultNextTime = new TimeSpan(0, 1, 0);
@@ -198,7 +196,7 @@ namespace PodcastHelper.Function
 					}
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				ErrorTracker.CurrentError = ex.Message;
 			}
@@ -238,7 +236,7 @@ namespace PodcastHelper.Function
 				{
 					foreach (XmlNode node in parent.ChildNodes)
 					{
-						int parseInt = -1;
+						int parseInt;
 						switch (node.Name.ToLowerInvariant())
 						{
 							case "apiversion":
@@ -282,17 +280,13 @@ namespace PodcastHelper.Function
 
 		private static PlayingState ParseState(string value)
 		{
-			switch (value.ToLowerInvariant())
+			return value.ToLowerInvariant() switch
 			{
-				case "playing":
-					return PlayingState.Playing;
-				case "paused":
-					return PlayingState.Paused;
-				case "stopped":
-					return PlayingState.Stopped;
-				default:
-					return PlayingState.Paused;
-			}
+				"playing" => PlayingState.Playing,
+				"paused" => PlayingState.Paused,
+				"stopped" => PlayingState.Stopped,
+				_ => PlayingState.Paused,
+			};
 		}
 
 		private static FileInformation ParseFileInformation(XmlNode iNode)
@@ -310,7 +304,7 @@ namespace PodcastHelper.Function
 						{
 							case "info":
 								var attName = HelperMethods.FindXmlAttribute(node, "name");
-								switch(attName.ToLowerInvariant())
+								switch (attName.ToLowerInvariant())
 								{
 									case "filename":
 										ret.FileName = node.InnerText;

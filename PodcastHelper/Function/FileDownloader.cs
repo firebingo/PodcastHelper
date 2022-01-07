@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,30 +10,30 @@ namespace PodcastHelper.Function
 {
 	public static class FileDownloader
 	{
-		private static Queue<FileDownloadInfo> _queue;
+		private static readonly Queue<FileDownloadInfo> _queue;
 		private static FileDownloadInfo _downloadingFile;
-		private static Stream _downloadingStream;
-		private static FileStream _fileStream;
-		private static CancellationTokenSource cancelSource = new CancellationTokenSource();
-		private static Thread _doThread;
+		private static readonly CancellationTokenSource _cancelSource = new CancellationTokenSource();
+		private static readonly Thread _doThread;
 		private static bool _runThread = true;
-		private static HttpClient _webClient;
+		private static readonly HttpClient _webClient;
+		private static readonly Memory<byte> _buffer;
 		public delegate void onDownloadFinished(bool res, int ep, string shortCode);
 		public static event onDownloadFinished OnDownloadFinishedEvent;
-		//public delegate void onDownloadingUpdate(string shortCode, int ep, float progress);
-		//public static event onDownloadingUpdate OnDownloadUpdateEvent;
+		public delegate void onDownloadingUpdate(string shortCode, int ep, float progress);
+		public static event onDownloadingUpdate OnDownloadUpdateEvent;
 
 		static FileDownloader()
 		{
 			_queue = new Queue<FileDownloadInfo>();
 			_downloadingFile = null;
+			_buffer = new byte[1024 * 16];
 			_webClient = new HttpClient();
 			//Shouldnt cause any problems for downloading but may make someone watching agents server side double check :)
 			_webClient.DefaultRequestHeaders.Add("User-Agent", "NCSA Mosaic/1.0 (X11;SunOS 4.1.4 sun4m)");
-			_downloadingStream = null;
 			_runThread = true;
 			_doThread = new Thread(RunThread);
 			_doThread.Name = "FileDownloader";
+			_doThread.Priority = ThreadPriority.BelowNormal;
 			_doThread.Start();
 		}
 
@@ -63,20 +62,21 @@ namespace PodcastHelper.Function
 							if (!Directory.Exists(path))
 								Directory.CreateDirectory(path);
 
-							RunFileRequest().ConfigureAwait(false);
+							Task.Run(() => RunFileRequest());
 						}
 						catch (Exception ex)
 						{
+							_downloadingFile = null;
 							OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
 							ErrorTracker.CurrentError = ex.Message;
 						}
 					}
 				}
-				else if (_downloadingFile != null && _downloadingStream != null)
+				else if (_downloadingFile != null && _downloadingFile.ContentLength != 0)
 				{
 					try
 					{
-						//OnDownloadUpdateEvent?.Invoke(_downloadingFile.PodcastShortCode, _downloadingFile.EpNumber, _downloadingStream.Length / _downloadingStream.Position);
+						OnDownloadUpdateEvent?.Invoke(_downloadingFile.PodcastShortCode, _downloadingFile.EpNumber, _downloadingFile.ReadBytes / _downloadingFile.ContentLength);
 					}
 					catch { }
 				}
@@ -88,9 +88,8 @@ namespace PodcastHelper.Function
 
 		public static void Kill()
 		{
+			_cancelSource.Cancel();
 			_runThread = false;
-			if (_downloadingFile != null)
-				_doThread.Abort();
 		}
 
 		public static void AddFile(FileDownloadInfo info)
@@ -111,19 +110,11 @@ namespace PodcastHelper.Function
 			}
 			catch (Exception ex)
 			{
-				cancelSource.Cancel();
 				OnDownloadFinishedEvent?.Invoke(false, _downloadingFile.EpNumber, _downloadingFile.PodcastShortCode);
 				ErrorTracker.CurrentError = ex.Message;
 			}
 			finally
 			{
-				//These should already be disposed.
-				if (_fileStream != null)
-					_fileStream = null;
-				if (_downloadingStream != null)
-					_downloadingStream = null;
-				cancelSource.Dispose();
-				cancelSource = new CancellationTokenSource();
 				_downloadingFile = null;
 			}
 		}
@@ -132,13 +123,32 @@ namespace PodcastHelper.Function
 		{
 			try
 			{
-				using (_downloadingStream = await _webClient.GetStreamAsync(_downloadingFile.FileUri))
+				using var response = await _webClient.GetAsync(_downloadingFile.FileUri, _cancelSource.Token);
+				if (!response.IsSuccessStatusCode)
 				{
-					using (_fileStream = new FileStream(_downloadingFile.FilePath, FileMode.Create, FileAccess.Write, FileShare.None))
-					{
-						await _downloadingStream.CopyToAsync(_fileStream, 81920, cancelSource.Token);
-					}
+					throw new Exception($"Download returned a error code: {(int)response.StatusCode} {response.StatusCode}");
 				}
+				using var contentStream = await response.Content.ReadAsStreamAsync(_cancelSource.Token);
+				_downloadingFile.ContentLength = contentStream.Length;
+				using (var fileStream = new FileStream(_downloadingFile.FilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+				{
+					var bytesRead = 0;
+					do
+					{
+						bytesRead = await contentStream.ReadAsync(_buffer, _cancelSource.Token);
+						if (bytesRead == 0)
+							break;
+						else
+						{
+							await fileStream.WriteAsync(_buffer, _cancelSource.Token);
+							_downloadingFile.ReadBytes += bytesRead;
+						}
+					}
+					while (!_cancelSource.Token.IsCancellationRequested);
+				}
+				//If we shutdown in the middle of downloading delete the file we started
+				if (_cancelSource.Token.IsCancellationRequested)
+					File.Delete(_downloadingFile.FilePath);
 			}
 			catch
 			{
@@ -153,5 +163,7 @@ namespace PodcastHelper.Function
 		public string FilePath { get; set; }
 		public string FileUri { get; set; }
 		public string PodcastShortCode { get; set; }
+		public long ContentLength { get; set; }
+		public long ReadBytes { get; set; }
 	}
 }

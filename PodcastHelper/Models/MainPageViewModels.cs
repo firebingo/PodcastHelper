@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -45,7 +42,7 @@ namespace PodcastHelper.Models
 
 	public class RecentPodcastListData : INotifyPropertyChanged
 	{
-		private object ListLock = new object();
+		private readonly object _listLock = new object();
 
 		List<PodcastEpisodeView> _list = null;
 		public List<PodcastEpisodeView> RecentList
@@ -56,7 +53,7 @@ namespace PodcastHelper.Models
 			}
 			set
 			{
-				lock (ListLock)
+				lock (_listLock)
 				{
 					_list.Clear();
 					_list = value;
@@ -74,7 +71,7 @@ namespace PodcastHelper.Models
 		{
 			try
 			{
-				lock (ListLock)
+				lock (_listLock)
 				{
 					_list = new List<PodcastEpisodeView>();
 					foreach (var item in list)
@@ -99,7 +96,7 @@ namespace PodcastHelper.Models
 
 	public class RecentPlayedListData : INotifyPropertyChanged
 	{
-		private object ListLock = new object();
+		private readonly object _listLock = new object();
 
 		List<PodcastEpisodeView> _list = null;
 		public List<PodcastEpisodeView> RecentList
@@ -110,7 +107,7 @@ namespace PodcastHelper.Models
 			}
 			set
 			{
-				lock (ListLock)
+				lock (_listLock)
 				{
 					_list.Clear();
 					_list = value;
@@ -128,7 +125,7 @@ namespace PodcastHelper.Models
 		{
 			try
 			{
-				lock (ListLock)
+				lock (_listLock)
 				{
 					_list = new List<PodcastEpisodeView>();
 					foreach (var item in list)
@@ -320,7 +317,7 @@ namespace PodcastHelper.Models
 		{
 			if (episode != null)
 			{
-				if(!MovingTimeSlider)
+				if (!MovingTimeSlider)
 					SliderPosition = episode.Progress.Progress * 100;
 				if (_maxValue.Ticks != episode.Progress.Length.Ticks)
 					MaxValue = episode.Progress.Length;

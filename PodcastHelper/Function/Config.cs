@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using PodcastHelper.Models;
+﻿using PodcastHelper.Models;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 
 namespace PodcastHelper.Function
 {
@@ -22,6 +22,7 @@ namespace PodcastHelper.Function
 			}
 		}
 
+		private readonly static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions() { WriteIndented = true };
 		private readonly string ConfigPath = @"AppData/Config.json";
 		private readonly string EpisodeListPath = @"AppData/Episodes.json";
 		private readonly string MomentsPath = @"AppData/Moments.json";
@@ -33,10 +34,9 @@ namespace PodcastHelper.Function
 		{
 			try
 			{
-				var serializerSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
 				if (File.Exists(EpisodeListPath))
 				{
-					EpisodeList = JsonConvert.DeserializeObject<PodcastEpisodeList>(File.ReadAllText(EpisodeListPath), serializerSettings);
+					EpisodeList = JsonSerializer.Deserialize<PodcastEpisodeList>(File.ReadAllText(EpisodeListPath));
 				}
 				else
 				{
@@ -45,7 +45,7 @@ namespace PodcastHelper.Function
 
 				if (File.Exists(ConfigPath))
 				{
-					ConfigObject = JsonConvert.DeserializeObject<ConfigModel>(File.ReadAllText(ConfigPath), serializerSettings);
+					ConfigObject = JsonSerializer.Deserialize<ConfigModel>(File.ReadAllText(ConfigPath));
 				}
 				else
 				{
@@ -55,7 +55,7 @@ namespace PodcastHelper.Function
 
 				if (File.Exists(MomentsPath))
 				{
-					MomentsList = JsonConvert.DeserializeObject<MomentsConfig>(File.ReadAllText(MomentsPath), serializerSettings);
+					MomentsList = JsonSerializer.Deserialize<MomentsConfig>(File.ReadAllText(MomentsPath));
 				}
 				else
 				{
@@ -76,31 +76,19 @@ namespace PodcastHelper.Function
 				string directoryName = Path.GetDirectoryName(ConfigPath);
 				if (!Directory.Exists(directoryName))
 					Directory.CreateDirectory(directoryName);
-				using (StreamWriter writer = new StreamWriter(File.Create(ConfigPath)))
+				using (var writer = File.Create(ConfigPath))
 				{
-					JsonSerializer serializer = new JsonSerializer()
-					{
-						Formatting = Formatting.Indented
-					};
-					serializer.Serialize(writer, ConfigObject);
+					JsonSerializer.Serialize(writer, ConfigObject, _jsonSerializerOptions);
 				}
 
-				using (StreamWriter writer = new StreamWriter(File.Create(EpisodeListPath)))
+				using (var writer = File.Create(EpisodeListPath))
 				{
-					JsonSerializer serializer = new JsonSerializer()
-					{
-						Formatting = Formatting.Indented
-					};
-					serializer.Serialize(writer, EpisodeList);
+					JsonSerializer.Serialize(writer, EpisodeList, _jsonSerializerOptions);
 				}
 
-				using (StreamWriter writer = new StreamWriter(File.Create(MomentsPath)))
+				using (var writer = File.Create(MomentsPath))
 				{
-					JsonSerializer serializer = new JsonSerializer()
-					{
-						Formatting = Formatting.Indented
-					};
-					serializer.Serialize(writer, MomentsList);
+					JsonSerializer.Serialize(writer, MomentsList, _jsonSerializerOptions);
 				}
 			}
 			catch (Exception ex)
@@ -142,8 +130,7 @@ namespace PodcastHelper.Function
 
 		public static void GetPlacement(IntPtr windowHandle)
 		{
-			WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-			GetWindowPlacement(windowHandle, out placement);
+			GetWindowPlacement(windowHandle, out var placement);
 
 			Config.Instance.ConfigObject.WindowPlacement = placement;
 			Config.Instance.SaveConfig();

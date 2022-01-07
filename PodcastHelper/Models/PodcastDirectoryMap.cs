@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
 using System.Xml;
 using System.ServiceModel.Syndication;
 using PodcastHelper.Helpers;
 using System.Linq;
-using System.Net;
 using PodcastHelper.Function;
+using System.Text.Json.Serialization;
+using System.Collections.Concurrent;
 
 namespace PodcastHelper.Models
 {
 	public class PodcastDirectoryMap
 	{
-		public Dictionary<string, PodcastDirectory> Podcasts;
-
-		public PodcastDirectoryMap()
-		{
-			Podcasts = new Dictionary<string, PodcastDirectory>();
-		}
+		public Dictionary<string, PodcastDirectory> Podcasts { get; set; } = new Dictionary<string, PodcastDirectory>();
 
 		public void CreateEmptyIfNone()
 		{
@@ -30,17 +25,17 @@ namespace PodcastHelper.Models
 
 	public class PodcastDirectory
 	{
-		public string ShortCode { get; set; }
-		public List<string> Names { get; set; }
-		public string FolderPath { get; set; }
-		public string RssPath { get; set; }
-		public int MinEpisodeCount { get; set; }
-		public int MaxEpisodeCount { get; set; }
-		public int LatestEpisode { get; set; }
-		public int LastPlayed { get; set; }
+		public string ShortCode { get; set; } = "null";
+		public List<string> Names { get; set; } = new List<string>() { "Null Podcast" };
+		public string FolderPath { get; set; } = "null";
+		public string RssPath { get; set; } = string.Empty;
+		public int MinEpisodeCount { get; set; } = 0;
+		public int MaxEpisodeCount { get; set; } = int.MaxValue;
+		public int LatestEpisode { get; set; } = 0;
+		public int LastPlayed { get; set; } = 0;
 		//private bool _hasLatest;
-		private SyndicationFeed _feedCache;
-		private Dictionary<int, PodcastEpisode> _episodes;
+		private SyndicationFeed _feedCache = null;
+		private ConcurrentDictionary<int, PodcastEpisode> _episodes = null;
 
 		[JsonIgnore]
 		public string PrimaryName
@@ -53,31 +48,12 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		//[JsonIgnore]
-		//XmlReaderSettings _xmlSettings = new XmlReaderSettings();
-
-		public PodcastDirectory()
-		{
-			Names = new List<string>() { "Null Podcast" };
-			RssPath = string.Empty;
-			ShortCode = "null";
-			FolderPath = "null";
-			MinEpisodeCount = 0;
-			MaxEpisodeCount = int.MaxValue;
-			LatestEpisode = 0;
-			LastPlayed = 0;
-			//_hasLatest = false;
-			_episodes = null;
-			//_xmlSettings.DtdProcessing = DtdProcessing.Parse;
-			//_xmlSettings.MaxCharactersFromEntities = 2048;
-		}
-
 		public void CheckListLoaded()
 		{
 			if (_episodes == null)
 			{
 				if (!Config.Instance.EpisodeList.Episodes.ContainsKey(ShortCode))
-					Config.Instance.EpisodeList.Episodes.Add(ShortCode, new Dictionary<int, PodcastEpisode>());
+					Config.Instance.EpisodeList.Episodes.Add(ShortCode, new ConcurrentDictionary<int, PodcastEpisode>());
 				_episodes = Config.Instance.EpisodeList.Episodes[ShortCode];
 			}
 		}
@@ -126,7 +102,7 @@ namespace PodcastHelper.Models
 						ep.Value.IsDownloaded = false;
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				ErrorTracker.CurrentError = ex.Message;
 			}
@@ -142,15 +118,21 @@ namespace PodcastHelper.Models
 			CheckListLoaded();
 
 			var addedNew = false;
-			foreach (var f in _feedCache.Items)
+
+			Parallel.ForEach(_feedCache.Items, (f) =>
 			{
 				var num = HelperMethods.GetEpisodeNumberFromFeed(f);
+				//Kinda sucks but I havn't come up with a better way to handle these odd episodes at the moment
+				if (num == -1)
+					return;
+
+				//I alsways need to read this url and update it since the url to download can change.
+				Uri enclosure = null;
+				if (f.Links != null)
+					enclosure = f.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
+
 				if (!_episodes.ContainsKey(num) && num != -1 && num >= MinEpisodeCount && num <= MaxEpisodeCount)
 				{
-					Uri enclosure = null;
-					if (f.Links != null)
-						enclosure = f.Links.FirstOrDefault(x => x.RelationshipType.ToLowerInvariant() == "enclosure")?.Uri;
-
 					List<string> keywords = null;
 					TimeSpan duration = new TimeSpan();
 					foreach (var ext in f.ElementExtensions)
@@ -173,21 +155,25 @@ namespace PodcastHelper.Models
 						Title = f.Title?.Text ?? string.Empty,
 						Description = f.Summary?.Text ?? string.Empty,
 						PublishDateUtc = f.PublishDate.UtcDateTime,
-						Keywords = keywords?.ToArray() ?? new string[0]
+						Keywords = keywords?.ToArray() ?? Array.Empty<string>()
 					};
+
 					if (enclosure != null)
 						episode.FileUri = enclosure;
+
 					episode.Progress.Length = duration;
-					_episodes.Add(num, episode);
+					_episodes.TryAdd(num, episode);
 					addedNew = true;
 				}
-			}
+				else if (enclosure != null)
+					_episodes[num].FileUri = enclosure;
+			});
 
 			if (addedNew)
 				Config.Instance.SaveConfig();
 		}
 
-		public Task<bool> DownloadEpisode(int episode)
+		public bool DownloadEpisode(int episode)
 		{
 			var info = new FileDownloadInfo();
 			if (_episodes.ContainsKey(episode))
@@ -200,9 +186,9 @@ namespace PodcastHelper.Models
 				info.PodcastShortCode = ShortCode;
 				FileDownloader.AddFile(info);
 				FileDownloader.OnDownloadFinishedEvent += OnFinishDownloading;
-				return Task.FromResult(true);
+				return true;
 			}
-			return Task.FromResult(false);
+			return false;
 		}
 
 		private void OnFinishDownloading(bool res, int ep, string shortCode)
@@ -213,17 +199,15 @@ namespace PodcastHelper.Models
 			episodeToUse.IsDownloaded = res;
 			Config.Instance.SaveConfig();
 			FileDownloader.OnDownloadFinishedEvent -= OnFinishDownloading;
-			PodcastFunctions.UpdateLatestPodcastList().ConfigureAwait(false);
+			PodcastFunctions.UpdateLatestPodcastList();
 		}
 
 		private Task GetFeed()
 		{
-			XmlReader reader = null;
-			SyndicationFeed feed = null;
 			try
 			{
-				reader = XmlReader.Create(RssPath);
-				feed = SyndicationFeed.Load(reader);
+				var reader = XmlReader.Create(RssPath);
+				var feed = SyndicationFeed.Load(reader);
 				reader.Close();
 				_feedCache = feed;
 				return Task.FromResult(0);
@@ -235,7 +219,7 @@ namespace PodcastHelper.Models
 			}
 		}
 
-		private string[] GetRootAndOneSubFiles(string path)
+		private static string[] GetRootAndOneSubFiles(string path)
 		{
 			var retval = new List<string>();
 			Directory.CreateDirectory(path);
@@ -253,12 +237,7 @@ namespace PodcastHelper.Models
 	public class PodcastEpisodeList
 	{
 		//               short name        ep num  episode info
-		public Dictionary<string, Dictionary<int, PodcastEpisode>> Episodes { get; set; }
-
-		public PodcastEpisodeList()
-		{
-			Episodes = new Dictionary<string, Dictionary<int, PodcastEpisode>>();
-		}
+		public Dictionary<string, ConcurrentDictionary<int, PodcastEpisode>> Episodes { get; set; } = new Dictionary<string, ConcurrentDictionary<int, PodcastEpisode>>();
 	}
 
 	public class PodcastEpisode
@@ -294,7 +273,7 @@ namespace PodcastHelper.Models
 			FileUri = null;
 			IsDownloaded = false;
 			PublishDateUtc = DateTime.MinValue;
-			Keywords = new string[0];
+			Keywords = Array.Empty<string>();
 		}
 	}
 
